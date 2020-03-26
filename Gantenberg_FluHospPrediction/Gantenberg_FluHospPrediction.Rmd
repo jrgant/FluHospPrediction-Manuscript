@@ -1,0 +1,68 @@
+---
+title: "Predicting seasonal influenza hospitalization using the ensemble super learner: a simulation study"
+author:
+  - name: Jason R. Gantenberg
+    email: jrgant@brown.edu
+    affiliation: 1
+    corresponding: jrgant@brown.edu
+  - name: Kevin W. McConeghy
+    affiliation: 2
+  - name: Laura B. Balzer
+    affiliation: 3
+  - name: Chanelle J. Howe
+  - affiliation: 4
+  - name: Andrew R. Zullo
+  - affiliation: 2
+address:
+  - code: 1
+    address: Departments of Epidemiology and Health Services, Policy, and Practice, Brown University School of Public Health, 121 S. Main St., Providence, RI, 02912
+  - code: 2
+    address: Department of Health Services, Policy and Practice, 121 S. Main St., Providence, RI, 02912; Providence VA Medical Center, 830 Chalkstone Ave., Providence, RI, 02908
+  - code: 3
+  - address: Department of Biostatistics and Epidemiology, School of Public Health and Health Sciences, University of Massachusetts Amherst, 427 Arnold House, 715 N. Pleasant St., Amherst, MA 01003
+  - code: 4
+    address: Department of Epidemiology, Center for Epidemiology and Environmental Health, Brown University School of Public Health, 121 S. Main St., Providence, RI, 02912
+abstract: |
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eget porta erat. Morbi consectetur est vel gravida pretium. Suspendisse ut dui eu ante cursus gravida non sed sem. Nullam sapien tellus, commodo id velit id, eleifend volutpat quam. Phasellus mauris velit, dapibus finibus elementum vel, pulvinar non tellus. Nunc pellentesque pretium diam, quis maximus dolor faucibus id. Nunc convallis sodales ante, ut ullamcorper est egestas vitae. Nam sit amet enim ultrices, ultrices elit pulvinar, volutpat risus.
+
+author_summary: |
+  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eget porta erat. Morbi consectetur est vel gravida pretium. Suspendisse ut dui eu ante cursus gravida non sed sem. Nullam sapien tellus, commodo id velit id, eleifend volutpat quam. Phasellus mauris velit, dapibus finibus elementum vel, pulvinar non tellus. Nunc pellentesque pretium diam, quis maximus dolor faucibus id. Nunc convallis sodales ante, ut ullamcorper est egestas vitae. Nam sit amet enim ultrices, ultrices elit pulvinar, volutpat risus.
+
+bibliography: references.bib
+output: rticles::plos_article
+csl: plos.csl
+---
+
+# Meta
+
+**Target journal:** _PLoS Computational Biology_
+
+\noindent
+**Section:** Epidemiology and Clinical/Translational Studies
+
+\noindent
+**Potential editors:**
+
+- Benjamin Althouse
+- Miles Davenport
+- Matthew Ferrari
+- Roger Kouyos
+- James Lloyd-Smith
+
+\noindent
+**Potential reviewers:**
+
+- Ryan J. Tibshirani (co-author on paper we use for curve simulation)
+- Logan C. Brooks (co-author on paper we use for curve simulation)
+- Roni Rosenfeld (co-author on paper we use for curve simulation)
+- Sherri Rose
+- David A. Osthus
+- Samrachana Adhikari
+
+
+# Introduction
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eget porta erat. Morbi consectetur est vel gravida pretium. Suspendisse ut dui eu ante cursus gravida non sed sem. Phasellus mauris velit, dapibus finibus elementum vel, pulvinar non tellus. Nunc pellentesque pretium diam, quis maximus dolor faucibus id. Nunc convallis sodales ante, ut ullamcorper est egestas vitae. Nam sit amet enim ultrices, ultrices elit pulvinar, volutpat risus.
+
+
+# References {#references .unnumbered}
