@@ -11,7 +11,7 @@ author:
     affiliation:
     - 2
     - 3
-  - name: Laura B. Balzer
+  - name: Jon Steingrimsson 
     affiliation: 4
   - name: Chanelle J. Howe
   - affiliation: 5
@@ -27,26 +27,37 @@ address:
   - code: 3
     address: Providence VA Medical Center, 830 Chalkstone Ave., Providence, RI, 02908
   - code: 4
-    address: Department of Biostatistics and Epidemiology, School of Public Health and Health Sciences, University of Massachusetts Amherst, 427 Arnold House, 715 N. Pleasant St., Amherst, MA 01003
+    address: Department of Biostatistics, Brown University School of Public Health, 121 S. Main St., Providence, RI 02912
   - code: 5
     address: Department of Epidemiology, Center for Epidemiology and Environmental Health, Brown University School of Public Health, 121 S. Main St., Providence, RI, 02912
 abstract: |
   Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eget porta erat. Morbi consectetur est vel gravida pretium. Suspendisse ut dui eu ante cursus gravida non sed sem. Nullam sapien tellus, commodo id velit id, eleifend volutpat quam. Phasellus mauris velit, dapibus finibus elementum vel, pulvinar non tellus. Nunc pellentesque pretium diam, quis maximus dolor faucibus id. Nunc convallis sodales ante, ut ullamcorper est egestas vitae. Nam sit amet enim ultrices, ultrices elit pulvinar, volutpat risus.
 
-author_summary: |
-  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eget porta erat. Morbi consectetur est vel gravida pretium. Suspendisse ut dui eu ante cursus gravida non sed sem. Nullam sapien tellus, commodo id velit id, eleifend volutpat quam. Phasellus mauris velit, dapibus finibus elementum vel, pulvinar non tellus. Nunc pellentesque pretium diam, quis maximus dolor faucibus id. Nunc convallis sodales ante, ut ullamcorper est egestas vitae. Nam sit amet enim ultrices, ultrices elit pulvinar, volutpat risus.
+author_summary: scing elit. Curabitur eget porta erat. Morbi consectetur est vel gravida pretium. Suspendisse ut dui eu ante cursus gravida non sed sem. Nullam sapien tellus, commodo id velit id, eleifend volutpat quam. Phasellus mauris velit, dapibus finibus elementum vel, pulvinar non tellus. Nunc pellentesque pretium diam, quis maximus dolor faucibus id. Nunc convallis sodales ante, ut ullamcorper est egestas vitae. Nam sit amet enim ultrices, ultrices elit pulvinar, volutpat risus.
 
 bibliography: references.bib
 output: rticles::plos_article
 csl: plos.csl
+
+header-includes:
+    - \usepackage{booktabs}
+    - \usepackage{threeparttable}
+
+always_allow_html: true
 ---
+
+\textcolor{red}{\textbf{Note to co-authors:} Two authors from Sanofi may be added after they review the manuscript.}
 
 # Meta
 
-**Target journal:** _PLoS Computational Biology_
+**Target journal:**
+
+- _PLoS Computational Biology_
 
 \noindent
-**Section:** Epidemiology and Clinical/Translational Studies
+**Section:**
+
+- Epidemiology and Clinical/Translational Studies
 
 \noindent
 **Potential editors:**
@@ -66,30 +77,564 @@ csl: plos.csl
 - Sherri Rose
 - David A. Osthus
 - Samrachana Adhikari
+- Oleg Sofrygin (sl3 package author)
+- Nima Hejazi (sl3 package author)
+- Jeremy Coyle (sl3 package author -- I did ask him a question about parallelization with sl3, so it may not be appropriate to have him as a reviewer)
 
 ```{r include=FALSE}
-library(FluHospPrediction)
+pacman::p_load(
+  FluHospPrediction,
+  ggplot2,
+  ggthemes,
+  gridExtra,
+  data.table,
+  tidyverse,
+  kableExtra,
+  knitr,
+  flextable
+)
+
+opts_chunk$set(
+  echo = FALSE,
+  cache = TRUE
+)
+
 ```
 
 # Introduction
 
-Each year, seasonal influenza causes approximately XXXX hospitalizations and XXXX deaths per year in the United States alone [cite]. Being able to predict how influenza-related hospitalizataions will change over time during any given influenza season can assist policymakers, public health officials, and physicians allocate resources appropriately and prepare more efficiently for changes in hospitalization rates.
+Between 2010 and 2017, approximately 140,000--570,000 individuals have been hospitalized and 12,000--51,000 have died annually due to seasonal influenza in the United States [@Centers_for_Disease_Control_and_Prevention2020-uc]. Being able to predict how influenza-related hospitalizations will change over time during any given influenza season can assist policymakers, public health officials, and physicians allocate resources appropriately and prepare more efficiently for changes in hospitalization rates [@Lutz2019-co].
 
-While influenza forecasting is a still-maturing science [@Reich2019-uk], researchers have made considerable progress over the past decade in improving the quality of and capacity for forecasting influenza-like illness (ILI) [cite], thanks in part to the FluSight forecasting competitions sponsored by the Centers for Disease Control and Prevention (CDC) since the 2013--14 flu season [cite]. Many different types of models have been used to generate forecasts, including statistical time series models [@Reich2019-uk; @Biggerstaff2018-ns], Bayesian regression [cite], and agent-based models [cite], among others. However, ensemble methods have emerged as perhaps the most promising approach to improving the accuracy and stability of epidemic predictions [@Reich2019-ca; @Ray2018-ef].
+While influenza forecasting is a still-maturing science [@Reich2019-uk; @Chretien2014-dy], researchers have made considerable progress over the past decade in improving the quality of and capacity for forecasting influenza-like illness (ILI) [cite], thanks in part to the FluSight forecasting competitions sponsored by the Centers for Disease Control and Prevention (CDC) since the 2013--14 flu season [@Reich2019-uk]. Many different types of models have been used to generate forecasts, including statistical time series models [@Reich2019-uk; @Biggerstaff2018-ns], Bayesian methods [@Chretien2014-dy; @Brooks2015-fl], and agent-based models [@Chretien2014-dy], among others. However, ensemble methods have emerged as perhaps the most promising approach to improving the accuracy and stability of epidemic predictions due to their ability to combine predictions from multiple estimators [@Reich2019-ca; @Ray2018-ef; @Lutz2019-co].
 
-Ensembles combine predictions generated by a set of component models [@Reich2019-ca; @Hastie2009-ft; @Wolpert1992-pw; @Breiman1996-ez]. In some cases, ensembles aggreggate component model predictions by weighting better predictions more highly in the final ensemble prediction [@Ray2018-ef; @Reich2019-ca], though other weighting criteria can be applied [@Ray2018-ef]. The rationale for using ensemble predictions rests in their ability to borrow the strengths and discard the weaknesses of various component models. This feature tends to lead not only to more accurate predictions but to more stable ones that can be applied across a range of scenarios [@Ray2018-ef]. The CDC's primary in-season ILI forecasts are now based on an ensemble forecast generated by aggregating predictions from a growing library of individual forecasts submitted by research teams around the U.S. [].
+Ensembles combine predictions generated by a set of component models [@Reich2019-ca; @Hastie2009-ft; @Wolpert1992-pw; @Breiman1996-ez]. In some cases, ensembles aggreggate component model predictions by weighting better predictions more highly in the final ensemble prediction [@Ray2018-ef; @Reich2019-ca], though other weighting criteria can be applied [@Ray2018-ef]. The rationale for using ensemble predictions rests in their ability to borrow the strengths and discard the weaknesses of various component models. This feature tends to lead not only to more accurate predictions but to more stable ones that can be applied across a range of scenarios [@Ray2018-ef]. The CDC's primary in-season ILI forecasts are now based on an ensemble forecast generated by aggregating predictions from a growing library of individual forecasts submitted by research teams around the U.S. [@Reich2019-uk].
 
 To date, most work has focused on ILI [@Reich2019-uk; @Biggerstaff2018-ns; @McGowan2019-ph; @Kandula2018-sq; @Brooks2015-fl], with considerably less effort having been exerted so far on predicting influenza-related hospitalization rates [@Kandula2019-tg]. Because the dynamics of flu-related hospitalizations might evolve differently over the course of an influenza season---at the very least, lagging influenza incidence by a week or two [citation needed]---and because hospitalization rates are an independent signal of the severity of disease caused by circulating flu strains, optimizing ensembles to predict hospitalization rates can provide complementary information to ILI forecasts.
 
-One ensemble machine learning method in particular, dubbed "super learner" [@Van_der_Laan2007-ml; @Polley2010-cb; @Polley2011-oz], exhibits a number of desirable properties that suggest it may be a powerful tool for predicting flu hospitalizations. First, its developers have demonstrated that, asymptotically, the super learner is an oracle estimator, performing as well as the best-fitting component model and converging almost as quickly [@Polley2010-cb] [also will want to read and cite the 2003 paper of van der Laan's]. Second, this oracle property generally translates to finite samples [cite correct Polley and van der Laan papers]. Finally, several packages have been developed to implement the super learner algorithm [@Polley2019-sl; @Coyle2020-ze], providing researchers easy access to a relatively large library of component models and a means to calculate cross-validated prediction risks quite easily [@Coyle2020-ze].
+One ensemble machine learning method in particular, dubbed "super learner" [@Van_der_Laan2007-ml; @Polley2010-cb; @Polley2011-oz], exhibits a number of desirable properties that suggest it may be a powerful tool for predicting flu hospitalizations. First, its developers have demonstrated that, asymptotically, the super learner is an oracle estimator, performing as well as the best-fitting component model and converging almost as quickly [@Polley2010-cb] [also will want to read and cite the 2003 paper of van der Laan's]. Second, this oracle property generally translates to finite samples [@Polley2010-cb; @Polley2011-oz; @Van_der_Laan2007-ml]. Finally, several packages have been developed to implement the super learner algorithm [@Polley2019-sl; @Coyle2020-ze], providing researchers easy access to a relatively large library of component models and a means to calculate cross-validated prediction risks quite easily [@Coyle2020-ze].
 
-In this study, we sought to train an ensemble learner on a distribution of simulated influenza hospitalization curves to generate predictions for three seasonal target parameters based on the CDC forecasting competitions [@Centers_for_Disease_Control_and_Prevention_undated-tx]: peak hospitalization rate, peak week of the season, and cumulative hospitalization rate. We sought to compare the performance of the ensemble learner to the best-performing component model and a naive historical average prediction across the 30 weeks of a flu season for each of these three prediction targets.
+In this study, we sought to train an ensemble learner on a distribution of simulated influenza hospitalization curves to generate predictions for three national-level seasonal target parameters based on the CDC forecasting competitions [@Centers_for_Disease_Control_and_Prevention_undated-tx] to compare the performance of the ensemble learner against the best-performing component model and a naive historical average prediction for each of these targets across the 30 weeks of a typical flu season.
 
 # Methods
 
+## Empirical data
+
+We downloaded publicly available surveillance data seasonal influenza-related hospitalizations from the CDC's FluView Interactive dashboard [@Centers_for_Disease_Control_and_Prevention_undated-vt]. Specifically, we included data from the Emerging Infections Program (EIP) beginning with the 2003--2004 season and ending with the 2018--2019 season, omitting the 2009-2010 pandemic year. The EIP contains data on flu-related hospitalizations in California, Colorado, Connecticut, Georgia, Maryland, Minnesota, New Mexico, New York, Oregon, and Tennessee [@Centers_for_Disease_Control_and_Prevention_undated-vt]. Since the 2009-2010 the FluSurv Network included between 3 and 6 states in addition to those included in EIP, depending on the year [@Centers_for_Disease_Control_and_Prevention_undated-vt]. We elected to use only the EIP data in order to maintain consistency within the empirical data and to increase the number of flu seasons available to inform both curve simulation and parameters targets.
+
+Typically, the CDC releases data for epiweeks 40--53 and 1--17 (approximately, October through April of the next year) [@Centers_for_Disease_Control_and_Prevention_undated-vt; @Centers_for_Disease_Control_and_Prevention_undated-pu]. We renumbered the epiweeks 1--30, omitting epiweek 53 as only three seasons had influenza hospitalization data recorded in this week (an artifact of leap years). 
+
+## Prediction targets
+
+Following from the CDC's Flu Sight challenge [@Centers_for_Disease_Control_and_Prevention_undated-tx], we defined three season-level prediction targets: peak rate, peak week, and cumulative hospitalizations. _Peak rate_ refers to the highest weekly rate of influenza-related hospitalizations throughout the course of a flu season (per 100,000 population), _peak week_ to the week during which this peak rate occurs, and _cumulative hospitalizations_ to the cumulative influenza-related hospitalization rate over the 30 weeks of the season (per 100,000 population) [@Centers_for_Disease_Control_and_Prevention_undated-tx]. 
+
+Fifteen empirical observations were available for each prediction target, corresponding to the number of flu seasons contained in the CDC's surveillance data (Table 1).
+
+```{r target-table}
+
+targets <- fread("C:/Users/jason/Documents/Github/FluHospPrediction/results/paper_output/table01-prediction-targets.csv")
+
+cap <- "Empirical distributions of peak hospitalization rate, peak week and cumulative hospitalization rate in the United States, 2003--2019."
+
+fn <- "Source: CDC FluView. Peak rate and cumulative rate expressed per 100,000 population. Pandemic influenza season 2009--2010 omitted."
+
+if (knitr::is_latex_output()) { 
+  targets %>%
+    kable(
+      format = "latex",
+      booktabs = TRUE,
+      caption = cap
+    ) %>%
+    kableExtra::footnote(
+      fn,
+      general_title = "",
+      threeparttable = TRUE
+    )
+} else {
+  targets %>%
+    flextable(., cwidth = 1.6) %>%
+    bold(., part = "header") %>%
+    add_header_lines(., paste("Table 1:", cap)) %>%
+    add_footer_lines(., fn)
+}
+
+```
+
+## Hospitalization curve simulation
+
+To simulate a distribution of seasonal influenza hospitalization curves, we adapted an approach by Brooks et al. originally used to predict influenza-like illness [@Brooks2015-fl]. First, we fit a linear trend filter [@Kim2009-bz; @Tibshirani2014-tr] to the 15 observed influenza hospitalization curves from the EIP using the `glmgen` package in R [@Arnold2015-tb, @RCore2020-ct]. The `glmgen` linear trend filter is a penalized method that fits a piecewise linear function to a time series, testing 50 values of the penalty ($\lambda$) [@Arnold2015-tb]. In all cases, we selected the fit that used the 25th penalty value tested (S1 Fig). We then used these fits as templates for the simulated influenza hospitalization curves.
+
+Next, we incorporated the 15 fit objects into a modified version of the curve generation scheme described in Brooks et al. [@Brooks2015-fl]. Our notation borrows and follows closely from theirs.
+
+
+Briefly, Brooks et al. conceptualize as seasonal influenza curve as some function plus noise [@Brooks2015-fl]. Adapted to the hospitalization case, the hospitalization rate ($y^s_i$) in season $s$ and week $i$ is given by
+
+$$y^s_i = f^s(i) + \epsilon^s_i, \epsilon \sim N(0, \tau^s),$$
+
+where $f^s(i)$ is a hospitalization rate and $\epsilon^s_i$ is normally distributed error term with  mean 0 and variance $\tau^s$.
+
+For each empirical season $s$, we use its linear trend filter fit and average the squared residuals over $i$ to estimate $\tau^s$:
+
+```{r, results="asis"}
+if (knitr::is_latex_output()) {
+  cat("$$\\left( \\hat{\\tau}^s \\right)^2 = \\genfrac{}{}{0pt}{}{\\text{avg}}{i} \\left[ y^s_i - \\hat{f}^s (i) \\right]^2.$$")
+} else {
+  cat("$$( \\hat{\\tau}^s )^2 = \\substack{ \\text{avg} \\\\ i } [ y^s_i - \\hat{f}^s (i) ]^2.$$")
+}
+```
+For each simulated curve, each of the following parameters is sampled randomly and independently:
+
+$$\langle f, \sigma, \nu, \theta, \mu \rangle,$$
+
+where $f$ denotes a randomly selected vector of estimated hospitalization rates based on a linear trend filter fit to empirical season $s$, $\sigma$ denotes the squared error of a linear trend filter fit to randomly sampled season $s'$ and averaged across all weeks, $\nu$ denotes a random uniform draw from the range [0.75, 1.25], $\theta$ denotes a random draw from the vector of peak hospitalization rates based on the 15 trend filter fits, and $\mu$ denotes a random draw from the vector of peak weeks based on the 15 trend filter fits (Table 2).
+
+```{r sim-param-input-table}
+
+ptab <- tibble::tribble(
+  ~Parameter,
+  ~Description,
+
+  "Shape",
+  "$f \\sim U \\{ \\hat{f} : \\text{historical season } s \\}$",
+
+  "Noise",
+  "$\\sigma \\sim U \\{\\hat{\\tau}^{s'} \\text{ : historical season } s' \\}$",
+
+  "Pacing",
+  "$\\nu \\sim U[0.75, 1.25]$, stretches the curve around the peak week",
+
+  "Peak height",
+  "$\\theta \\sim U\\left[\\theta_{min} , \\theta_{max}\\right]$",
+
+  "Peak week",
+  "$\\mu \\sim U[\\mu_{min}, \\mu_{max}]$"
+)
+
+cap <- "Input parameters to the influenza hospitalization curve generating function."
+fn <- "The noise parameter for each simulation is drawn separately, and may come from a season different than the season used as the shape."
+
+if (knitr::is_latex_output()) {
+ptab %>%
+  kable(
+    format = "latex",
+    escape = FALSE,
+    booktabs = TRUE,
+    caption = cap
+  ) %>%
+  kableExtra::footnote(
+    fn,
+    general_title = "",
+    threeparttable = TRUE
+  )
+} else {
+  ptab %>%
+    flextable(cwidth = c(1, 4)) %>%
+    bold(part = "header") %>%
+    add_header_lines(paste("Table 2:", cap)) %>%
+    add_footer_lines(fn)
+}
+```
+
+The generating function for hospitalization rate in week $i$ of simulated season $sim$ is therefore given by:
+
+```{r, results="asis"}
+if (knitr::is_latex_output()) {
+  cat("$$f^{sim} (i) = \\frac{\\theta}{\\text{max}_j f(j)} \\left[ f \\left( \\frac{i - \\mu}{v} + \\genfrac{}{}{0pt}{}{\\text{arg max }{j}}{f(j)} \\right) \\right] + \\epsilon_i, \\epsilon_i \\sim N(0, \\hat{\\tau}^{s'}),$$")
+} else {
+  cat("$$f^{sim} (i) = \\frac{\\theta}{\\text{max}_j f(j)} \\left[ f \\left( \\frac{i - \\mu}{v} + \\substack{\\text{arg max }{j} \\\\ f(j) } \\right) \\right] + \\epsilon_i, \\epsilon_i \\sim N(0, \\hat{\\tau}^{s'}),$$")
+}
+```
+
+where $f(j)$ now denotes the vector of fitted hospitalization rates from the linear trend filter fit (randomly selected shape $f$) and $j$ the integer week for which we want to retrieve the prediction from this fit (equal to $i$). $max_j f(j)$ denotes the peak hospitalization rate from the selected shape, whereas `r ifelse(knitr::is_latex_output(), "$\\genfrac{}{}{0pt}{}{\\text{arg max } {j}}{f(j)}$", "$\\substack{\\text{arg max }{j} \\\\ f(j) }$")` denotes the week in which this peak occurred. The parameters $\theta$, $\mu$, and $\nu$ follow from their prior description. Finally, we introduce noise for each simulated weekly hospitalization rate based on the selected estimate of $\tau^2$.
+
+We alter the original curve formula to impose a lower bound of 0 on the hospitalization rate via the following transformation of $\hat{y}^s_i$, denoted below as $\hat{z}^s_i$:
+
+$$\hat{z}^s_i = 0.5 \bigg( | \hat{y}^s_i | + \hat{y}^s_i \bigg).$$
+
+This transformation effectively preserves positive simulated hospitalization rates and sets negative hospitalization rates to 0. Negative hospitalization rates may be generated at the tails of a given season, when hospitalization rates are generally low, because the error is normally distributed in all weeks.
+
+In all, we simulated 15,000 curves in order to generate an average of 1,000 simulated curves with shapes based on each empirical season (S2 Fig). These simulated curves may be thought of as a plausible distribution of hypothetical flu seasons that could be observed in principle but perhaps have not yet been realized [@Brooks2015-fl].
+
+```{r emphypfig, echo = FALSE, out.width="70%", fig.height=8, fig.cap = "Empirical (top) and 15 randomly selected simulated (bottom) hospitalization curves. Empirical source: CDC, Emerging Infections Program (omitting 2009--2010 pandemic influenza season).", message = F, fig.dev = "png", fig.res=1200}
+
+sim <- readRDS("C:/Users/jason/Documents/Github/FluHospPrediction/data/cleaned/hypothetical-curves.Rds")
+
+theme_tweak <-
+  theme_base(
+    base_size = 16,
+    base_family = "serif"
+  ) +
+  theme(
+    axis.ticks.y = element_blank(),
+    axis.line.x = element_blank(),
+    axis.line.y = element_blank(),
+    legend.position = "bottom",
+    plot.caption = element_text(size = 10, face = "italic"),
+    plot.background = element_blank()
+  )
+
+emp_hosp <- ggplot(emp, aes(x = weekint, y = weekrate)) +
+  geom_line(
+    aes(group = season),
+    alpha = 0.4
+  ) +
+  labs(
+    x = "Week",
+    y = "Hospitalization rate (per 100,000)"
+  ) +
+  theme_tweak
+
+set.seed(9834784)
+simsub <- 15
+
+hyp_hosp_p <-
+  ggplot(sim$outhc[cid %in% sample(cid, size = simsub)],
+         aes(x = weekint,
+             y = prediction)
+         ) +
+  geom_line(aes(group = cid),
+            alpha = 0.4
+            ) +
+  coord_cartesian(y = c(0, 10)) +
+  labs(x = "Week",
+       y = "Simulated hospitalizations (per 100,000)"
+       ) +
+  theme_tweak +
+  theme(legend.position = "none")
+
+grid.arrange(emp_hosp, hyp_hosp_p)
+
+```
+
+```{r simcompare, out.width="100%", fig.height=3, fig.cap="Empirical (N = 15) vs. simulated (N = 15,000) target distributions.", fig.res=1200, fig.dev="png"}
+
+theme_set(
+  theme_base(
+    base_size = 14,
+    base_family = "serif"
+  ) +
+  theme(
+    axis.title = element_text(size = 8),
+    plot.background = element_blank())
+  )
+
+sim_pkht_dist <- sim$outhc[, .(pkht = max(prediction)), cid]
+
+sim_pkwk_dist <- sim$outhc[,
+  .(pkwk = weekint[prediction == max(prediction)]), cid]
+
+sim_cumhosp_dist <- sim$outhc[, cumhosp := cumsum(prediction), by = "cid"] %>%
+  .[weekint == max(weekint)]
+
+targets$type <- "Observed"
+
+sim_pkht_dist$type <- "Simulated"
+sim_pkwk_dist$type <- "Simulated"
+sim_cumhosp_dist$type <- "Simulated"
+
+xlab <- "Curve type"
+
+pkht_compare <- rbind(targets[, .(pkht = `Peak rate`, type)],
+      sim_pkht_dist[, .(pkht, type)]) %>%
+  ggplot(aes(x = type, y = pkht)) +
+  geom_boxplot(fill = "aliceblue") +
+  labs(
+    x = xlab,
+    y = "Peak hospitalization rates (per 100,000)"
+  )
+
+
+pkwk_compare <- rbind(targets[, .(pkwk = `Peak week`, type)],
+      sim_pkwk_dist[, .(pkwk, type)]) %>%
+  ggplot(aes(x = type, y = pkwk)) +
+  geom_boxplot(fill = "aliceblue", outlier.size = 0.7) +
+  labs(
+    x = xlab,
+    y = "Weeks in which peak hospitalizations occured"
+  )
+
+ch_compare <- rbind(targets[, .(cumhosp = `Cumulative rate`, type)],
+      sim_cumhosp_dist[weekint == max(weekint), .(cumhosp, type)]) %>%
+  ggplot(aes(x = type, y = cumhosp)) +
+  geom_boxplot(fill = "aliceblue", outlier.size = 0.7) +
+  labs(
+    x = xlab,
+    y = "Cumulative hospitalization rates (per 100,000)"
+  )
+
+grid.arrange(pkht_compare, pkwk_compare, ch_compare, nrow = 1)
+```
+
+
+## Super learner
+
+The super learner is a loss-based estimation algorithm [@Van_der_Laan2007-ml; @Polley2010-cb; @Polley2011-oz]. It takes as inputs training data, a so-called "library" of component models (called _learners_), and a desired loss function specified to optimize model fits against a given prediction target. See Naimi & Balzer for an accessible introduction [@Naimi2018-fv].
+
+For each prediction target, we specified the same loss function and component model library and trained the super learner on the simulated distribution of hospitalization curves.
+
+We opted to use the $L_1$ absolute error loss function to target the median of each prediction target distribution [@Polley2011-oz], meaning the ensemble learner would seek to minimize prediction risk by minimizing the absolute difference between a simulated instance of the prediction target and a given learner's prediction. Finally, we conducted the super learner procedure at each week using the following covariates: hospitalization rate per 100,000 population in week *i*, cumulative hospitalizations per 100,000 population in through week *i*, hospitalization rates from all prior weeks, cumulative hospitalizations from all prior weeks, the difference between the hospitalization rate in week *i* and the hospitalization rate in each prior week up to 5 weeks in the past, the difference between the cumulative hospitalization rate in week *i* and the cumulative hospitalization rate in each prior week up to 5 weeks in the past, interactions between hospitalization rate in week *i* and each of the cumulative hospitalization differences, and interactions between cumulative hospitalization rate in week *i* and each of the hospitalizaion rate differences.
+
+The general procedures is as follows:
+
+1. Specify the library of component learners (i.e., prediction algorithms).
+
+2. Specify the parameter targets and loss function(s).
+
+3. Split the simulated data into 15 folds, each fold containing simulated curves based on the same empirical template season. Splitting the data in this way accounts for the dependence between simulated seasons that rely on the same underlying shape.
+
+4. Train the super learner on the dataset using 15-fold cross-validation, such that each fold is used once as the validation set.
+
+5. Calculate the risk for each candidate model.
+
+6. Generate the ensemble learner as a weighted combination of the component model predictions using a non-negative least squares regression model where model coefficients (i.e., component model weights) are normalized to sum to one and constrained to be greater than or equal to 0 and less than or equal to 1 [@Naimi2018-fv].
+
+\textcolor{red}{\textbf{Note to co-authors:} I plan to write this out more formally as an algorithm.}
+
+In all, we trained 6X component models to each task, including variations on tuning and input parameters for the various learners (Table 2).
+
+
+## Target 1: Peak rate
+
+General form:
+
+$$E[I(Y_i = 1)A_i | \bar{A}_{i=d}, \bar{X}_{i=d}) = \beta_0 + \vec{\beta}_a \bar{A}_{i=d} + \vec{\beta}_x \bar{X}_{i=d} + \vec{\beta}_t \bar{T}(i=d)$$
+
+where $i$ indexes the week of the season, $c$ indicates the current week at which we are making a prediction of the target, $Y_i = 1$ identifies the week as the week in which the peak hospitalization rate occurred, $\bar{A}_{i=d}$ indicates the history of hospitalization rates through week $i=d$, $\bar{X}_{i=d}$ indicates the history of cumulative hospitalization rates through week $i=d$, and $\bar{T}(i)$ indicates derived variables to capture time trends and/or proposed interactions between variables. Each beta coefficient topped with an arrow and including a lowercase subscript indicates the vector of coefficients implied by the corresponding variable history.
+
+
+## Target 2: Peak week
+
+General form of the candidate models:
+
+$$E(I(Y_i = 1)i | \bar{A}_{i=d}, \bar{X}_{i=d}) = \beta_0 + \vec{\beta}_a \bar{A}_{i=d} + \vec{\beta}_x \bar{X}_{i=d} + \vec{\beta}_t  \bar{T}(i)$$
+
+where $i$ indexes the week of the season, $I(Y_i = 1)$ is the indicator function that identifies a week as being the season's peak, $\bar{A}_{i=d}$ indicates the history of hospitalization rates through week $i=d$, $\bar{X}_{i=d}$ indicates the history of cumulative hospitalization rates through week $i=d$, and $\bar{T}(i)$ indicates derived variables to capture time trends and/or proposed interactions between variables. Each beta coefficient topped with an arrow and including a lowercase subscript indicates the vector of coefficients implied by the corresponding variable history.
+
+
+## Target 3: Cumulative hospitalizations
+
+General form:
+
+$$E[X_{i=30} | \bar{A}_{i=d}, \bar{X}_{i=d}) = \beta_0 + \vec{\beta}_a \bar{A}_{i=d} + \vec{\beta}_x \bar{X}_{i=d} + \vec{\beta}_t \bar{T}(i=d)$$
+
+where $i$ indexes a week of the season, $c$ indicates the current week at which we are making a prediction of the target, $\bar{A}_{i=d}$ indicates the history of hospitalization rates through week $d$, $\bar{X}_{i=d}$ indicates the history of cumulative hospitalization rates through week $d$, and $\bar{T}(i)$ indicates derived variables to capture time trends and/or proposed interactions between variables. Each beta coefficient topped with an arrow and including a lowercase subscript indicates the vector of coefficients implied by the corresponding variable history.
+
+# Component models
+
+We used the same library of component models to build the super learner for all three prediction targets (Table 3). The component models included a standard linear regression model, generalized additive models [cite], loss-based regression models (e.g., lasso, ridge) [cite], random forests [cite], support vector regression [cite], neural networks [cite], loess [cite], and polynomial multivariate adaptive regression splines [cite].
+
+
+```{r candmodels-tuning-table}
+tunetab <- tribble(
+  ~ Model,
+  ~ `Tuning parameters`,
+  ~ `R package`,
+
+  "Linear regression",
+  "Variables screened for inclusion first using a cross-validated lasso procedure to omit variables with zero-valued coefficients.",
+  "base",
+
+  "Random forest (regression trees)",
+  "number of trees = [50, 100, 200, 500], terminal node sizes = [3, 5, 10]",
+  "randomForest",
+
+  "Generalized additive model",
+  "gamma penalty = [1, 2, 3, 4, 5]",
+  "gam",
+
+  "Support vector regression",
+  "kernel = [radial, polynomial], degree = [1, 2, 3] applied only to polynomial",
+  "svm",
+
+  "Loss-based regression",
+  "penalty = [lasso, ridge]",
+  "glmnet",
+
+  "Elastic net",
+  "alpha penalty = [0.25, 0.5, 0.75]",
+  "glmnet",
+
+  "Neural network",
+  "number of nodes in hidden layer = [5, 10, 25, 50, 75, 100], decay = [0, 0.005, 0.1, 0.2, 0.4]",
+  "nnet",
+
+  "Loess",
+  "span = [0.25, 0.5, 0.75, 1]",
+  "base",
+
+  "Polynomial multivariate adaptive regression spline",
+  "gcv penalty = [2, 4, 6, 8, 10]",
+  "polspline",
+  )
+
+cap <- "Component models and tuning parameters."
+fn <- "For the random forest and neural network learners, all combinations of the tuning parameters shown were proposed."
+
+if (knitr::is_latex_output()) {
+  tunetab %>%
+    kable(
+      booktabs = T,
+      format = "latex",
+      caption = cap
+    ) %>%
+    kable_styling(
+      latex_options = c("striped", "scale_down"),
+      ) %>%
+    column_spec(1:2, width = "2.1in") %>%
+    kableExtra::footnote(general_title = "", fn)
+} else {
+  tunetab %>%
+    flextable(., cwidth = c(2.1, 3.2, 1.2)) %>%
+    fit_to_width(., max_width = 8) %>% 
+    bold(., part = "header") %>%
+    add_header_lines(paste("Table 3:", cap)) %>%
+    add_footer_lines(fn)
+}
+ 
+```
+
+## Linear regression
+
+For each week of the flu season, we specified a linear regression model that included covariates chosen by a lasso-based screening algorithm [cite] in which covariates with non-zero coefficients were identified using 10-fold cross validation and then entered into the linear regression. The linear model was specified using the `glm()` function in R with a Gaussian error distribution and identity link.
+
+## Loss-based regression
+
+We implemented several loss-based regression learners using the `glmnet` package in R [cite]. These learners included a learner with the standard lasso penalty [cite], a learner with the ridge penalty [cite], and three versions of the elastic net model [cite], which combines the lasso and ridge penalties in the same model. Specifically, we ran the elastic net model with $\alpha$ penalties set at 0.25, 0.5, and 0.75. 
+
+## Random forests
+
+## Support vector regression
+
+## Neural networks
+
+## Loess
+
+## Polynomial multivariate adaptive regression splines
+
+\textcolor{red}{\textbf{Note to co-authors:} Subject to further updates based on candidate availability in package tlverse/sl3. Dr. Steingrimsson, the GAMs mentioned in Table 3 are all returning errors to me, saying there are fewer model parameters than degrees of freedom. Also, I had planned at one point to include some GBMs, but I didn't feel comfortable doing so because I just didn't feel like I understood them well enough.}
+
+\newpage
 # Results
 
+## Peak rate
+
+The ensemble superlearner consistently performed worse---i.e., had a higher mean risk---than both the discrete super learner and the mean prediction.
+
+\textcolor{red}{\textbf{Note to co-authors:} See Table 4 for some preliminary results. Please note that I had to do a little additional debugging, and so these risks were calculated on the squared error loss instead of the absolute error loss. I'm not sure whether the results will change much, though anecdotally, the mean risks did seem to be different when I did some short test runs with the absolute error loss on an abbreviated stack of learners. You'll notice we see something a little strange in Table 4, too. While the super learner is supposed to have desirable oracle properties (the ensemble learner should asymptotically be very close to the discrete super learner), the super learner seems to be affected negatively by poorly fitting candidate models, so much so that it actually performs \emph{worse} than taking a simple mean as the prediction. The discrete super learner, however, which is the best-fitting indiviudal component model in a given week exhibits more or less what I expected: didn't give us much improvement over a simple mean early in the season but performed better (generally) as the season progressed. I am not convinced the strange results with the ensemble aren't due to some poor choice of tuning parameters on my part, since many of these component models are ones I haven't worked with before. Dr. Steingrimsson, it would be great to run some of the models by you if you have time.}
+
+
+```{r risks-datadir}
+results_output <- "C:/Users/jason/Documents/Github/FluHospPrediction/results/paper_output"
+
+```
+
+```{r peakrate-risk-table}
+
+pkrate_risks <- fread(file.path(results_output, "table-04_peakrate-risks.csv"))
+
+cap <- "Cross-validated risks for the ensemble super learner, discrete super learner, and mean predictions of peak hospitalization rate, by week of influenza season. Estimates presented as mean risk (standard error)."
+
+fn <- c("The ensemble super learner (SuperLearner) is the prediction generated as a weighted combination of component model predictions. The discrete super learner (Discrete SL) is the best-performing component model. The mean (Mean) is the average peak hospitalization rate per 100,000 population across the simulated hospitalization curves.")
+
+if (knitr::is_latex_output()) {
+  pkrate_risks %>%
+    kable(
+      booktabs = TRUE,
+      format = "latex",
+      caption = cap
+    ) %>%
+    kableExtra::footnote(
+      general_title = "",
+      fn,
+      threeparttable = TRUE
+    )
+} else {
+  pkrate_risks %>%
+    flextable(cwidth = c(0.6, 1.3, 1.3, 1.3)) %>%
+    bold(., part = "header") %>%
+    add_header_lines(paste("Table 4:", cap)) %>%
+    add_footer_lines(fn)
+}
+
+```
+
+
+\textcolor{red}{\textbf{Note to co-authors:} Table 5 may not be very informative. Usually, these numbers are shown with a risk plot, but because of some very poorly fit models in the component set, the plots weren't helpful.}
+
+
+## Peak week
+
+```{r peakweek-risk-table, eval = FALSE}
+
+pkweek_risks <- fread(file.path(results_output, "table-04_peakweek-risks.csv"))
+
+cap <- "Cross-validated risks for the ensemble super learner, discrete super learner, and mean predictions of the week in which the peak hospitalization rate occurs, by week of influenza season. Estimates presented as mean risk (standard error)."
+
+fn <- c("The ensemble super learner (SuperLearner) is the prediction generated as a weighted combination of component model predictions. The discrete super learner (Discrete SL) is the best-performing component model. The mean (Mean) is the average week during which the peak hospitalization rate occurred across the simulated hospitalization curves.")
+
+if (knitr::is_latex_output()) {
+  pkweek_risks %>%
+    kable(
+      booktabs = TRUE,
+      format = "latex",
+      caption = cap
+    ) %>%
+    kableExtra::footnote(
+      general_title = "",
+      fn,
+      threeparttable = TRUE
+    )
+} else {
+  pkweek_risks %>%
+    flextable(cwidth = c(0.6, 1.3, 1.3, 1.3)) %>%
+    bold(., part = "header") %>%
+    add_header_lines(paste("Table 5:", cap)) %>%
+    add_footer_lines(fn)
+}
+
+```
+
+
+
+## Cumulative hospitalizations
+
+```{r cumhosp-risk-table, eval = FALSE}
+
+cumhosp_risks <- fread(file.path(results_output, "table-06_cumhosp-risks.csv"))
+
+cap <- "Cross-validated risks for the ensemble super learner, discrete super learner, and mean predictions of the cumulative hospitalization rate, by week of influenza season. Estimates presented as mean risk (standard error)."
+
+fn <- c("The ensemble super learner (SuperLearner) is the prediction generated as a weighted combination of component model predictions. The discrete super learner (Discrete SL) is the best-performing component model. The mean (Mean) is the average cumulative hospitalization rate per 100,000 across the simulated hospitalization curves.")
+
+if (knitr::is_latex_output()) {
+  pkweek_risks %>%
+    kable(
+      booktabs = TRUE,
+      format = "latex",
+      caption = cap
+    ) %>%
+    kableExtra::footnote(
+      general_title = "",
+      fn,
+      threeparttable = TRUE
+    )
+} else {
+  pkweek_risks %>%
+    flextable(cwidth = c(0.6, 1.3, 1.3, 1.3)) %>%
+    bold(., part = "header") %>%
+    add_header_lines(paste("Table 6:", cap)) %>%
+    add_footer_lines(fn)
+}
+
+```
+
+
 # Discussion
+
+## Limitations
+
+- $\lambda$ values used in the trend filter fits were arbitrary.
+
+- We did not include any mechanistic models in the component learner library (for instance, compartmental or agent-based models). Future work could incorporate such models, though most agent-based models may be too computationally intensive to use efficiently as component learners.
 
 # Software and code
 
@@ -97,9 +642,9 @@ All code is provided at ... [set up persistent DOI at Zenodo or Open Science Fra
 
 # Declarations
 
-## Acknowledgement
+## Acknowledgment
 
-We thank Ashley Naimi and Nicholas Reich for their comments on earlier versions of the analysis plan.
+We thank Ashley Naimi, Laura Balzer, and Nicholas Reich for their comments on the study aims and the super learner approach.
 
 ## Funding statement
 
@@ -109,8 +654,121 @@ This work was funded by an unrestricted grant from Sanofi (PI: Andrew Zullo). Th
 
 [solicit competing interests from co-authors]
 
-# References {#references .unnumbered}
 
-\bibliography{references}
+\newpage
 
 # Supporting information
+
+**S1 Fig. Linear trend filter fits to observed influenza hospitalization curves.** \bigskip
+
+```{r s1fig, out.width = "90%", fig.align="center"}
+
+results_folder <- "C:/Users/jason/Documents/Github/FluHospPrediction/results"
+
+if (knitr::is_latex_output()) {
+  include_graphics(file.path(results_folder, "trendfilter-fit-facet.pdf"))
+} else {
+  include_graphics(file.path(results_folder, "trendfilter-fit-facet.png"))
+}
+
+```
+
+
+\newpage
+\noindent
+**S2 Table. Number of simulated curves based on each observed flu season (Emerging Infections Program).**
+
+```{r s2table}
+tmpcts <- fread(file.path(results_output, "table-s02_template-counts.csv"))
+
+if (knitr::is_latex_output()) {
+  tmpcts %>%
+    knitr::kable(
+      format = "latex",
+      booktabs = TRUE
+    )
+} else {
+  tmpcts %>%
+    flextable %>%
+    bold(part = "header") %>%
+    autofit
+}
+
+```
+
+\newpage
+\noindent
+**S3 Table. Weekly cross-validated risks across the component learners used to predict peak hospitalization rate per 100,000 population.**
+
+```{r s3table-peakrate-meanrisk}
+
+rpsum <- fread(file.path(results_output, "table-s03_risk-distbyweek-pkrate.csv"))
+
+if (knitr::is_latex_output()) {
+  rpsum %>%
+    kable(
+      format = "latex",
+      booktabs = TRUE,
+      digits = 2,
+    )
+} else {
+  rpsum %>%
+    flextable(cwidth = c(0.6, rep(1.15, 5))) %>%
+    colformat_num(digits = 2) %>%
+    bold(., part = "header")
+}
+
+```
+
+\newpage
+\noindent
+**S4 Table. Weekly cross-validated risks across the component learners used to predict peak week.**
+
+```{r s4table-peakweek-meanrisk, eval = FALSE}
+
+rwsum <- fread(file.path(results_output, "table-s04_risk-distbyweek-pkweek.csv"))
+
+if (knitr::is_latex_output()) {
+  rwsum %>%
+    kable(
+      format = "latex",
+      booktabs = TRUE,
+      digits = 2,
+    )
+} else {
+  rwsum %>%
+    flextable(cwidth = c(0.6, rep(1.15, 5))) %>%
+    colformat_num(digits = 2) %>%
+    bold(., part = "header")
+}
+
+```
+
+\newpage
+\noindent
+**S5 Table. Weekly cross-validated risks across the component learners used to predict cumulative hospitalization rate per 100,000 population.**
+
+```{r s5table-cumhosp-meanrisk, eval = FALSE}
+
+rwsum <- fread(file.path(results_output, "table-s05_risk-distbyweek-cumhosp.csv"))
+
+if (knitr::is_latex_output()) {
+  rwsum %>%
+    kable(
+      format = "latex",
+      booktabs = TRUE,
+      digits = 2,
+    )
+} else {
+  rwsum %>%
+    flextable(cwidth = c(0.6, rep(1.15, 5))) %>%
+    colformat_num(digits = 2) %>%
+    bold(., part = "header")
+}
+
+```
+
+
+# References
+
+\bibliography{references}
