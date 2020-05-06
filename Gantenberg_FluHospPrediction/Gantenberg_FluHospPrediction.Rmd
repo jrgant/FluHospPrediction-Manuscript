@@ -14,30 +14,27 @@ always_allow_html: true
 
 **Short Title:** Predicting influenza hospitalizations with a super learner
 
-_Two authors from Sanofi may be added after they review the manuscript. Current author order tentative._
-
-Jason R. Gantenberg,(1,2) Kevin W. McConeghy,(2,3) Jon Steingrimsson,(4) Chanelle J. Howe,(5) Andrew R. Zullo(1,2)
+Jason R. Gantenberg,(1,2) Kevin W. McConeghy,(2,3) Jon Steingrimsson,(4) Chanelle J. Howe,(5) Robertus van Aalst,(6,7), Ayman Chit,(6), Andrew R. Zullo(1,2,3)
 
 
 **Corresponding author:** Jason R. Gantenberg (jrgant@brown.edu)
 
 1. Department of Epidemiology, Brown University School of Public Health, 121 S. Main St., Providence, RI, 02912
-
 2. Department of Health Services, Policy and Practice, 121 S. Main St., Providence, RI, 02912
-
 3. Providence VA Medical Center, 830 Chalkstone Ave., Providence, RI, 02908
-
 4. Department of Biostatistics, Brown University School of Public Health, 121 S. Main St., Providence, RI 02912
+5. Center for Epidemiology and Environmental Health, Brown University School of Public Health, 121 S. Main St., Providence, RI, 02912
+6. Sanofi Pasteur, Swiftwater, PA 18370
+7. Department of Health Sciences, University of Groningen, University Medical Center Groningen, Groningen, the Netherlands
 
-5. Department of Epidemiology, Center for Epidemiology and Environmental Health, Brown University School of Public Health, 121 S. Main St., Providence, RI, 02912
 
 # Abstract
 
-Recent interest in influenza forecasting, spurred in part by focused efforts by the Centers for Disease Control and Prevention in the United States to support forecasting collaborations, has led to improvement in prediction of seasonal influenza dynamics. To date, less focus has been paid to predicting seasonal influenza-related hospitalizations. We conducted a simulation study to measure the performance of a machine-learning algorithm (super learner) to predict three features of a given seasonal influenza epidemic: peak hospitalization rate, the week during which the hospitalization rate peaks, and the cumulative hospitalizations. We incorporated a set of [XX] component models and fit the super learner to a distribution of 15,000 simulated influenza hospitalization curves in order to generate weekly predictions for the prediction targets. We compared the performance of the ensemble super learner (a weighted combination of component model predictions), the discrete super learner (best-performing component model), and a prediction based on a simple mean of a given outcome across all simulated hospitalization curves. We found that the super learner algorithm was consistently capable of choosing individual component models that improved predictions of the three seasonal prediction targets above those of a simple mean prediction. However, we also found that the ensemble super learner consistently had higher prediction error than the discrete super learners and often performed comparably to a simple mean prediction. Given that influenza hospitalization forecasting depends on small sample sizes derived from past flu seasons, the ensembles' underperformance in a large sample of hypothetical influenza seasons suggests future work should investigate optimal combinations of component models that would improve ensemble predictions to the point where they consistently match the predictive accuracy of the best-performing component model.
+Seasonal influenza has a substantial impact on human health in the United States and worldwide. Accurate forecasts of key features of influenza epidemics and health care utilization can inform public health response to outbreaks. To date, predicting seasonal influenza-related hospitalizations has less frequently been the focus of forecasting efforts. We conducted a simulation study to measure the performance of a machine-learning algorithm (super learner) to predict three features of a given seasonal influenza epidemic: peak hospitalization rate, the week during which the hospitalization rate peaks, and the cumulative hospitalizations. We fit a set of statistical models and the super learner to 15,000 simulated influenza hospitalization curves to generate weekly predictions for the targets of interest. In each week, we compared the performance of the ensemble super learner (a weighted combination of component model predictions), the discrete super learner (best-performing individual statistical model), and a prediction based on a simple mean of a given outcome (e.g., mean peak hospitalization rate)  across all simulated hospitalization curves. We found that the general super learner algorithm---which subsumes both the selection of the discrete super learner and estimation of the ensemble super learner---was consistently capable of choosing individual statistical models that improved predictions of the three seasonal prediction targets over those of a simple mean prediction. However, the ensemble super learner consistently exhibited higher prediction error than the discrete super learners and often performed comparably to a simple mean prediction. Given that national-level influenza hospitalization forecasts based on empirical may rely on the small number of past flu seasons recorded in surveillance data, the ensembles' underperformance in a large sample of hypothetical influenza seasons suggests future work should determine the conditions under which ensemble models can be expected not to underperform the best-performing component model.
 
 # Author Summary
 
-Influenza forecasting is a still-maturing science, but notable improvements have been made over the past decade in predicting influenza-like activity. In addition, increasing focus on machine learning approaches has provided hope that such approaches may further improve predictive accuracy. Less work, however, has focused on predicting influenza-related hospitalizations, and we sought to investigate the potential for machine learning approaches to predict several features of influenza hospitalization dynamics that could help inform the allocation of public health efforts and resources during a flu season. We used a machine learning approach, called _super learner_, which is capable of taking a large number of different statistical models and either combining them into a single prediction (the ensemble prediction) or choosing the best-performing model. Our results indicate that ensemble predictions may not perform as well as individual models under certain conditions and that future work should focus on investigating when ensemble predictions based on machine learning would be expected to improve predictive accuracy.
+Influenza prediction is a still-maturing science, but notable improvements have been made over the past decade in predicting influenza-like activity. In addition, increasing focus on machine learning approaches has provided hope that such approaches may further improve predictive accuracy. Less work, however, has focused on predicting influenza-related hospitalizations, and we sought to investigate the potential for machine learning approaches to predict several features of influenza hospitalization dynamics that could help inform the allocation of public health efforts and resources during a flu season. We used a machine learning approach, called _super learner_, which is capable of taking a large number of different statistical models and either combining them into a single prediction (the ensemble prediction) or choosing the best-performing model. Our results suggest that ensemble super learner predictions may not perform as well as the best-performing statistical model under certain conditions. Future work should focus on investigating when ensemble predictions based on machine learning would be expected to improve predictive accuracy.
 
 # Meta
 
@@ -66,11 +63,11 @@ Influenza forecasting is a still-maturing science, but notable improvements have
 - Logan C. Brooks (co-author on paper we use for curve simulation)
 - Roni Rosenfeld (co-author on paper we use for curve simulation)
 - Sherri Rose (expert in machine/super learning)
-- David A. Osthus (flu modeler highly whose work came highly recommended by Nick Reich)
-- Samrachana Adhikari (biostatistician and former lab member in the Carnegie Mellon group [with RJ Tibshirani)
+- David A. Osthus (flu modeler whose work came highly recommended by Nick Reich)
+- Samrachana Adhikari (biostatistician and former lab member in the Carnegie Mellon group [with RJ Tibshirani])
 - Oleg Sofrygin (sl3 package author)
 - Nima Hejazi (sl3 package author)
-- Jeremy Coyle (sl3 package author -- I did have a brief exchange about the sl3 package with him, so it may not be appropriate to have him as a reviewer)
+- Jeremy Coyle (sl3 package author)
 
 ```{r include=FALSE}
 pacman::p_load(
@@ -92,7 +89,7 @@ opts_chunk$set(
 
 # paper output directory
 assetdir <-
-  "C:/Users/jason/Documents/Github/FluHospPrediction/results/paper_output/"
+  "C:/Users/jason/Documents/Github/FluHospPrediction/results/paper_output"
 
 # function to select which figure format to use based on pandoc output format
 putfigure <- function(slug) {
@@ -107,17 +104,20 @@ putfigure <- function(slug) {
 
 # Introduction
 
-Between 2010 and 2017, approximately 140,000--570,000 individuals have been hospitalized and 12,000--51,000 have died annually due to seasonal influenza in the United States [@Centers_for_Disease_Control_and_Prevention2020-uc]. Being able to predict the future burden of influenza-related hospitalizations during a given influenza season can assist policymakers, public health officials, and physicians in allocating resources appropriately and preparing for expected changes in hospitalization rates [@Lutz2019-co].
+Between 2010 and 2017, approximately 140,000--570,000 individuals were hospitalized and 12,000--51,000 died annually due to seasonal influenza in the United States [@Centers_for_Disease_Control_and_Prevention2020-uc]. The ability to predict the future burden of influenza-related hospitalizations during a given influenza season can help policymakers, public health officials, physicians, and other stakeholders to allocate resources appropriately and prepare for expected changes in hospitalization rates [@Lutz2019-co]. For example, forecasts could provide hospitals with enough time to shift inpatient hospital beds available for patients admitted with influenza-related illnesses **[cite]**.
 
-While influenza forecasting is a still-maturing science [@Reich2019-uk; @Chretien2014-dy], researchers have made considerable progress over the past decade in improving the quality of and capacity for forecasting influenza-like illness (ILI) [@Reich2019-uk], thanks in part to the FluSight forecasting competitions sponsored by the Centers for Disease Control and Prevention (CDC) since the 2013--14 flu season [@Reich2019-uk]. Many different types of models have been used to generate forecasts, including statistical time series models [@Reich2019-uk; @Biggerstaff2018-ns], Bayesian methods [@Chretien2014-dy; @Brooks2015-fl], and agent-based models [@Chretien2014-dy], among others. However, ensemble methods have emerged as a promising approach to improving further the accuracy and stability of epidemic predictions due to ensembles' ability to combine predictions from multiple estimators in a principled manner [@Reich2019-ca; @Ray2018-ef; @Lutz2019-co].
+While influenza forecasting is a still-maturing science [@Reich2019-uk; @Chretien2014-dy], researchers have made considerable progress over the past decade in improving the quality of and capacity for forecasting influenza-like illness (ILI) [@Reich2019-uk]. Many of these improvements have been spurred by the FluSight forecasting competitions sponsored by the Centers for Disease Control and Prevention (CDC) since the 2013--14 influenza season [@Reich2019-uk]. Many different types of models have been used to generate forecasts, including statistical time series models [@Reich2019-uk; @Biggerstaff2018-ns], Bayesian methods [@Chretien2014-dy; @Brooks2015-fl], and agent-based models [@Chretien2014-dy], among others. Ensemble methods have emerged as a particularly promising approach to improving further the accuracy and stability of epidemic predictions due to ensembles' ability to combine predictions from 
+multiple estimators in a principled manner [@Reich2019-ca; @Ray2018-ef; @Lutz2019-co].
 
-Ensemble methods combine predictions generated by a set of component models [@Reich2019-ca; @Hastie2009-ft; @Wolpert1992-pw; @Breiman1996-ez]. In some cases, ensembles aggreggate component model predictions by weighting better predictions more highly in the final ensemble prediction [@Ray2018-ef; @Reich2019-ca], though other weighting criteria can be applied [@Ray2018-ef]. One compelling rationale for using ensemble predictions rests in their ability to borrow the strengths and avoid the weaknesses of any single class of models used as inputs into the ensemble [@Van_der_Laan2007-ml]. This feature tends to lead not only to more accurate predictions but to more stable ones that can be applied across a range of scenarios [@Ray2018-ef]. The CDC's primary in-season ILI forecasts are now based on an ensemble forecast generated by aggregating predictions from a growing library of individual forecasts submitted by research teams around the United States [@Reich2019-uk].
+Ensemble methods combine predictions generated by a set of component models [@Reich2019-ca; @Hastie2009-ft; @Wolpert1992-pw; @Breiman1996-ez]. In some cases, ensembles aggreggate component model predictions by weighting better predictions more highly in the final ensemble prediction [@Ray2018-ef; @Reich2019-ca], though other weighting criteria can be applied [@Ray2018-ef]. One compelling rationale for using ensemble predictions rests in their ability to borrow the strengths and avoid the weaknesses of any single class of models used as inputs into the ensemble [@Van_der_Laan2007-ml]. This feature tends to lead not only to more accurate predictions but to more stable ones that can be applied across a range of scenarios [@Ray2018-ef]. The CDC's primary in-season outpatient ILI forecasts are now based on an ensemble forecast generated by aggregating predictions from a growing library of individual forecasts submitted by research teams around the United States [@Reich2019-uk].
 
-To date, most work in influenza forecasting has focused on ILI [@Reich2019-uk; @Biggerstaff2018-ns; @McGowan2019-ph; @Kandula2018-sq; @Brooks2015-fl], with considerably less work having been focused on predicting influenza-related hospitalization rates [@Kandula2019-tg]. Because the dynamics of influenza-related hospitalizations may evolve differently than those of influenza transmission itself over the course of a flu season---at the very least because consequent hospitalizations lag influenza incidence by a week or two [citation needed]---and because hospitalization rates are an independent signal of the severity of circulating flu strains [@Biggerstaff2018-ns], using ensemble methods to predict hospitalization rates could prove to be a value complement to existing efforts to forecast ILI.
+To date, most work in influenza forecasting has focused on ILI [@Reich2019-uk; @Biggerstaff2018-ns; @McGowan2019-ph; @Kandula2018-sq; @Brooks2015-fl], with considerably less work having been focused on predicting influenza-related hospitalization rates [@Kandula2019-tg]. Because influenza-related hospitalization dynamics may evolve differently than those of influenza transmission itself during a given flu season---for instance, consequent hospitalizations usually lag influenza incidence by one to two weeks **[citation needed]**---and because hospitalization rates signal the severity of circulating flu strains [@Biggerstaff2018-ns], using ensemble methods to predict hospitalization rates could be a value complement to existing efforts in ILI forecasting.
 
-One ensemble machine learning method in particular, dubbed "super learner" [@Van_der_Laan2007-ml; @Polley2010-cb; @Polley2011-oz], exhibits a number of desirable properties that suggest it may be a powerful tool for predicting flu hospitalizations. First, its developers have demonstrated that, asymptotically, the super learner is an oracle estimator, performing as well as the best-fitting component model and converging almost as quickly [@Polley2010-cb] [also will want to read and cite the 2003 paper of van der Laan's]. Second, this oracle property has been found to apply approximately finite samples [@Polley2010-cb; @Polley2011-oz; @Van_der_Laan2007-ml]. Finally, several packages have been developed to implement the super learner algorithm [@Polley2019-sl; @Coyle2020-ze], providing researchers easy access to a large library of component models and a means to efficiently calculate cross-validated prediction risks with respect to a desired loss function [@Coyle2020-ze].
+One ensemble machine learning method, dubbed "super learner" [@Van_der_Laan2007-ml; @Polley2010-cb; @Polley2011-oz], exhibits a number of desirable properties that suggest it may be a powerful tool for predicting flu hospitalizations. First, its developers have demonstrated that, asymptotically, the super learner is an oracle estimator, performing as well as the best-fitting component model [@Polley2010-cb; @Polley2011-oz], where the best-fitting component model performs as well as the true data-generating model [@Polley2010-cb] **[read and cite van der Laan & Dudoit, 2003?]**. Second, this oracle property has been found to apply approximately in finite samples [@Polley2010-cb; @Polley2011-oz; @Van_der_Laan2007-ml]. Several packages have been developed to implement the super learner algorithm [@Polley2019-sl; @Coyle2020-ze], providing researchers easy access to a large library of component models and a means to efficiently evaluate their predictive performance [@Coyle2020-ze]. 
 
-In this study, we trained an ensemble learner on a distribution of simulated influenza hospitalization curves to generate predictions for three national-level seasonal target parameters chosen based on the targets specified in CDC forecasting competitions [@Centers_for_Disease_Control_and_Prevention_undated-tx], in order to compare the performance of the ensemble learner against the best-performing component model and a naive historical average prediction for each of these targets across the 30 weeks of a typical flu season.
+The super learner requires a sufficient, though not exorbitant, sample size in order to implement embedded procedures (e.g., cross-validation) [@Van_der_Laan2007-ml]. However, the 15 empirical flu seasons available are not sufficient in number to develop the super learner.
+
+In this study, we trained an ensemble super learner on 15,000 simulated influenza hospitalization curves to generate predictions for three national-level seasonal target parameters chosen based on the targets specified in CDC forecasting competitions [@Centers_for_Disease_Control_and_Prevention_undated-tx]. We conducted the procedure independently at each of the 30 weeks in a typical flu season, and we compared the predictive performance of the ensemble super learner against those of the best-performing individual statistical model and a prediction based on the mean of the outcome across the simulated hospitalization curves. 
 
 # Methods
 
@@ -125,7 +125,7 @@ In this study, we trained an ensemble learner on a distribution of simulated inf
 
 We downloaded publicly available surveillance data on seasonal influenza-related hospitalizations from the CDC's FluView Interactive dashboard [@Centers_for_Disease_Control_and_Prevention_undated-vt]. Specifically, we included data from the Emerging Infections Program (EIP) beginning with the 2003--2004 season and ending with the 2018--2019 season, omitting the 2009-2010 pandemic influenza year. The EIP contains data on influenza-related hospitalizations in California, Colorado, Connecticut, Georgia, Maryland, Minnesota, New Mexico, New York, Oregon, and Tennessee [@Centers_for_Disease_Control_and_Prevention_undated-vt]. Since the 2009--2010 season the FluSurv Network has included between 3 and 6 states in addition to those represented in the EIP data, depending on the year [@Centers_for_Disease_Control_and_Prevention_undated-vt]. In order to maintain consistency within the empirical data, and to increase the number of flu seasons available to inform curve simulation, we did not include data from states outside the EIP.
 
-Typically, the CDC releases data for epiweeks 40--53 and 1--17 (approximately October through April of the next year) [@Centers_for_Disease_Control_and_Prevention_undated-vt; @Centers_for_Disease_Control_and_Prevention_undated-pu]. We renumbered the epiweeks 1--30, omitting epiweek 53, as only three seasons had influenza hospitalization data recorded in this week. When we refer subsequently to a "flu season", we refer to this 30-week time period.
+Typically, the CDC releases data for epiweeks 40--53 and 1--17, corresponding approximately to October through April of the next year [@Centers_for_Disease_Control_and_Prevention_undated-vt; @Centers_for_Disease_Control_and_Prevention_undated-pu]. Epiweeks are simply integers assigned to each week of the calendar year, where epiweek 1 is the first week of the year and epiweeks 52/53 the last [@Centers_for_Disease_Control_and_Prevention_undated-pu]. We renumbered the epiweeks 1--30, omitting epiweek 53, as only three seasons had influenza hospitalization data recorded in this week. When we refer subsequently to a _flu season_, we refer to this 30-week time period.
 
 ## Prediction targets
 
@@ -135,13 +135,13 @@ Following from the CDC's Flu Sight challenge [@Centers_for_Disease_Control_and_P
 2. _Peak week_, defined as the week during which this peak rate occurred; and
 3. _Cumulative hospitalizations_, defined as the cumulative influenza-related hospitalization rate over the 30 weeks of the flu season (per 100,000 population). 
 
-Fifteen empirical observations were available for each prediction target, corresponding to the number of flu seasons contained in the CDC's surveillance data (Table 1).
+Fifteen empirical observations were available for each prediction target, corresponding to the flu seasons recorded in the CDC's surveillance data (Table 1).
 
 ```{r target-table}
 
 targets <- fread(file.path(assetdir, "table-01_prediction-targets.csv"))
 
-cap <- "Empirical distributions of peak hospitalization rate, peak week and cumulative hospitalization rate in the United States, 2003--2019."
+cap <- "Empirical distributions of peak hospitalization rate, peak week, and cumulative hospitalization rate in the United States, 2003--2019."
 
 fn <- "Source: CDC FluView (Emerging Infections Program). Peak rate and cumulative rate expressed per 100,000 population. Pandemic influenza season 2009--2010 omitted."
 
@@ -171,7 +171,7 @@ if (knitr::is_latex_output()) {
 
 To simulate a distribution of seasonal influenza hospitalization curves, we adapted an approach by Brooks et al. originally used to predict influenza-like illness [@Brooks2015-fl]. First, we fitted a linear trend filter [@Kim2009-bz; @Tibshirani2014-tr] to the 15 observed influenza hospitalization curves from the EIP using the `glmgen` package in R [@Arnold2015-tb, @RCore2020-ct]. The `glmgen` linear trend filter is a penalized method that fits a piecewise linear function to a time series, testing 50 values of the penalty ($\lambda$) by default [@Arnold2015-tb]. We used these fits as templates for the simulated influenza hospitalization curves. In all cases, we selected the fit that used the 25th $\lambda$ value tested (S1 Fig) based on visual inspection of the overall distribution of simulated curves. 
 
-Next, we incorporated the 15 fit objects into a modified version of the curve generation scheme described in Brooks et al. [@Brooks2015-fl]. Our notation borrows and follows closely from theirs.
+Next, we used the resulting 15 trend filter fits into a modified version of the curve generation scheme described in Brooks et al. [@Brooks2015-fl]. Specifically, the original scheme was developed to simulate potential ILI curves, and therefore, the curve-generating function included a term for season-onset, representing the threshold ILI at which the flu season would be considered to have started [@Brooks2015-fl]. This onset is an additional prediction target in FluSight ILI forecasting because ILI surveillance is conducted year-round. On the contrary, such a threshold does not exist for influenza-related hospitalizations. Rather, hospitalization rates are recorded starting in epiweek 40 through the end of the flu season. Save for one season, hospitalization rates start at a rate of 0 per 100,000 [@Centers_for_Disease_Control_and_Prevention_undated-vt]. We modified the curve-generating function to omit the seasonal onset term and added a transformation that constrains simulated hospitalization rates to be greater than or equal to 0. Otherwise, our notation borrows and follows closely from theirs.
 
 Briefly, Brooks et al. conceptualize as seasonal influenza curve as some function plus noise [@Brooks2015-fl]. Adapted to the hospitalization case, the hospitalization rate ($y^s_i$) in season $s$ and week $i$ is given by
 
@@ -217,7 +217,7 @@ ptab <- tibble::tribble(
 )
 
 cap <- "Input parameters to the influenza hospitalization curve generating function."
-fn <- "The noise parameter for each simulation is drawn separately, and may come from a season different than the season used as the shape."
+fn <- "The noise parameter for each simulation is drawn separately and may come from a season different than the season used as the shape."
 
 if (knitr::is_latex_output()) {
     ptab %>%
@@ -257,9 +257,9 @@ We impose a lower bound of 0 on the hospitalization rate via the following trans
 
 $$\hat{z}^s_i = 0.5 \bigg( | \hat{y}^s_i | + \hat{y}^s_i \bigg).$$
 
-This transformation effectively preserves positive simulated hospitalization rates and sets negative hospitalization rates to 0. Negative hospitalization rates may be generated at the tails of a given season, when hospitalization rates are generally low, because the error is normally distributed in all weeks.
+This transformation effectively preserves positive simulated hospitalization rates and sets negative hospitalization rates to 0. Negative hospitalization rates may be generated at the tails of a given season, when hospitalization rates are generally low, because the error is normally distributed in all weeks. This transformation was imposed on 20.5% of the simulated weekly hospitalization rates simulated.
 
-In all, we simulated 15,000 curves so as to generate an average of 1,000 simulated curves based on each empirical season's shape (S2 Fig). These simulated curves may be thought of as a plausible distribution of hypothetical flu seasons that could be observed in principle but perhaps have not yet been realized [@Brooks2015-fl].
+In all, we simulated 15,000 curves (S2 Fig). These simulated curves may be thought of as a plausible distribution of hypothetical flu seasons that could be observed in principle but perhaps have not yet been realized [@Brooks2015-fl].
 
 ```{r fig01-empsim-compare, echo = FALSE, out.width="70%", fig.height=8, fig.cap = "Empirical (top) and 15 randomly selected simulated (bottom) hospitalization curves. Empirical source: CDC, Emerging Infections Program (omitting 2009--2010 pandemic influenza season).", message = F}
 
@@ -275,59 +275,44 @@ putfigure("fig02")
 
 ## Super learner
 
-The super learner is a loss-based estimation algorithm [@Van_der_Laan2007-ml; @Polley2010-cb; @Polley2011-oz]. It takes as inputs training data, a library of component models (called _learners_), and a desired loss function specified to optimize model fits against a given prediction target. See Naimi & Balzer for an accessible introduction [@Naimi2018-fv].
+The super learner is a loss-based estimation algorithm, meaning predictive performance is estimated by defining a loss function that targets a specific prediction target of interest [@Van_der_Laan2007-ml; @Polley2010-cb; @Polley2011-oz]. For instance, setting the loss function to be the squared error loss means that model accuracy is optimized to minimize the squared error, and hence, the implicit prediction target is the conditional mean. The super learner takes as inputs training data, a _library_ of component prediction algorithms (called _learners_ but which we refer to as component models), and a desired loss function. See Naimi & Balzer for an accessible introduction [@Naimi2018-fv].
 
-For each prediction target (peak rate, peak week, and cumulative hospitalizations), we specified the same loss function and component model library and trained the super learner on the simulated distribution of hospitalization curves using the `sl3` package in R [@Coyle2020-ze].
+For each prediction target (peak rate, peak week, and cumulative hospitalizations), we used the same library of component models and the $L_1$ absolute error loss function, which targets the conditional median of the prediction target [@Polley2011-oz]. The absolute error loss is defined as the absolute difference between the predicted and true observations [@Polley2011-oz]. 
 
-We used the $L_1$ absolute error loss function to target the median of each prediction target distribution [@Polley2011-oz], meaning the ensemble learner would seek to minimize prediction risk by minimizing the absolute difference between a simulated instance of the prediction target and a given learner's prediction. We conducted the entire super learner procedure sequentially at each week *i* using the following covariates: hospitalization rate per 100,000 population in week *i*, cumulative hospitalizations per 100,000 population through week *i*, hospitalization rates from all prior weeks, cumulative hospitalizations from all prior weeks, the difference between the hospitalization rate in week *i* and the hospitalization rate in each prior week up to 5 weeks in the past, the difference between the cumulative hospitalization rate in week *i* and the cumulative hospitalization rate in each prior week up to 5 weeks in the past, interactions between the hospitalization rate in week *i* and each of the cumulative hospitalization differences, and interactions between the cumulative hospitalization rate in week *i* and each of the hospitalization rate differences.
+We trained the super learner on the simulated hospitalization curves using the `sl3` package in R [@Coyle2020-ze]. We conducted the entire super learner procedure sequentially at each week *i*, proposing the following covariates (i.e., independent predictors) to each learner: 
 
-After specifying the library of component models and the loss function, we repeated the following procedure for each prediction target:
+- hospitalization rate per 100,000 population in week *i*, 
+- cumulative hospitalizations per 100,000 population through week *i*,
+- hospitalization rates from all weeks prior to week *i*, 
+- cumulative hospitalizations from all weeks prior to week *i*,
+- the difference between the hospitalization rate in week *i* and the hospitalization rate in each prior week up to 5 weeks in the past, 
+- the difference between the cumulative hospitalization rate in week *i* and the cumulative hospitalization rate in each prior week up to 5 weeks in the past
+- product terms between the hospitalization rate in week *i* and each of the cumulative hospitalization differences, and 
+- product terms between the cumulative hospitalization rate in week *i* and each of the hospitalization rate differences.
 
-1. Create 30 data sets, one for each week of the flu season, containing the outcomes and covariates as described previously.
+The predictive accuracy for the component models and the ensemble learner using 15-fold cross-validation [@Harrell2015-cd]. Briefly, *V*-fold cross-validation is an iterative sample-splitting procedure in which each observation is assigned to a group, called a fold, and where each fold serves as the validation set for a model trained on the rest of the sample [@Harrell2015-cd; @Naimi2018-fv]. This procedure maximizes the amount of data available for model-fitting, by avoiding the need for a hold-out validation sample, while at the same time avoiding overfitting [@Van_der_Laan2007-ml; @Naimi2018-fv]. The predictive accuracy of each learning algorithm is evaluated as a _risk_, in our case defined as the average absolute error between a learner's prediction and the true observation. These risks are estimated in each fold when it is assigned to be the validation set as part of the cross-validation procedure. Therefore, in the current context, the _cross-validated risk_ refers to the average risk across all 15 folds [@Van_der_Laan2007-ml, @Naimi2018-fv].
+
+We repeated the following procedure for each prediction target:
+
+1. Create 30 data sets, one for each week of the flu season, containing the outcome variables (peak rate, peak week, and cumulative hospitalizations) and the covariates described previously.
 
 3. Assign each observation to a fold for use in cross-validation. 
    a. We assigned all simulated curves based on a common observed season shape to the same fold, in order to account for the dependence between these simulated curves. We did not account for potential dependencies due to repeated sampling of the error term, as we believed the season shape was more consequential with respect to inducing dependence between simulated curves. 
 
 4. Run the super learner algorithm:
-   a. Train each learner on the data set using 15-fold cross-validation and calculate its cross-validated risk.
+   a. Train each learner on the data set using 15-fold cross-validation and calculate its cross-validated risk as the average risk across the 15 validation sets.
    b. Generate predictions with each component learner on the full data set.
-   c. Fit a metalearner by regressing each learner's predictions on the prediction target to estimate the ensemble weights for each model. For this purpose, we used a non-negative least squares regression model, constraining it to produce a convex combination of coefficients between 0 and 1 (inclusive) [@Naimi2018-fv]. Doing so normalizes the model coefficients (i.e., the weights assigned to each learner's predictions in the ensemble super learner) so that they sum to 1.
-   d. Calculate the cross-validated risk for the ensemble super learner.
+   c. Regress the current prediction target on each learner's predictions in the full sample (*N* = 15,000) using a non-negative least squares model constrained to produce coefficients in the range [0,1] and which sum to 1 [@Naimi2018-fv]. These constraints are not necessary but are theoretically expected to improve the stability of the ensemble estimator [@Van_der_Laan2007-ml]. This model is referred to as the _metalearner_ [@Coyle2020-ze].
+   d. Calculate the cross-validated risk for the ensemble super learner as in step 4a.
 
-In all, we trained [XXXXXX] component models in for each prediction target and week of the season, including variations on tuning and input parameters for the various learners (Table 2).
+In all, we trained **[62]** component models in for each prediction target and week of the season, including variations on tuning and input parameters for the various learners (Table 2).
 
-
-### Target 1: Peak rate
-
-The general form of the models proposed to predict peak rate is as follows:
-
-$$E[I(Y_i = 1)A_i | \bar{A}_{i=d}, \bar{X}_{i=d}) = \beta_0 + \vec{\beta}_a \bar{A}_{i=d} + \vec{\beta}_x \bar{X}_{i=d} + \vec{\beta}_t \bar{T}(i=d)$$
-
-where $i$ indexes the week of the season, $c$ indicates the current week at which we are making a prediction of the target, $Y_i = 1$ identifies the week as the week in which the peak hospitalization rate occurred, $\bar{A}_{i=d}$ indicates the history of hospitalization rates through week $i=d$, $\bar{X}_{i=d}$ indicates the history of cumulative hospitalization rates through week $i=d$, and $\bar{T}(i)$ indicates derived variables to capture time trends and/or proposed interactions between variables. Each beta coefficient topped with an arrow and including a lowercase subscript indicates the vector of coefficients implied by the corresponding variable history. The notation above does not incorporate basis functions for splines, kernels, penalties, or other terms that varied across component learners.
-
-
-### Target 2: Peak week
-
-The general form of the models proposed to predict peak week is as follows:
-
-$$E(I(Y_i = 1)i | \bar{A}_{i=d}, \bar{X}_{i=d}) = \beta_0 + \vec{\beta}_a \bar{A}_{i=d} + \vec{\beta}_x \bar{X}_{i=d} + \vec{\beta}_t  \bar{T}(i)$$
-
-where $i$ indexes the week of the season, $I(Y_i = 1)$ is the indicator function that identifies a week as being the season's peak, $\bar{A}_{i=d}$ indicates the history of hospitalization rates through week $i=d$, $\bar{X}_{i=d}$ indicates the history of cumulative hospitalization rates through week $i=d$, and $\bar{T}(i)$ indicates derived variables to capture time trends and/or proposed interactions between variables. Each beta coefficient topped with an arrow and including a lowercase subscript indicates the vector of coefficients implied by the corresponding variable history. The notation above does not incorporate basis functions for splines, kernels, penalties, or other terms that varied across component learners.
-
-
-### Target 3: Cumulative hospitalizations
-
-The general form of the models proposed to predict cumulative hospitalizations is as follows:
-
-$$E[X_{i=30} | \bar{A}_{i=d}, \bar{X}_{i=d}) = \beta_0 + \vec{\beta}_a \bar{A}_{i=d} + \vec{\beta}_x \bar{X}_{i=d} + \vec{\beta}_t \bar{T}(i=d)$$
-
-where $i$ indexes a week of the season, $c$ indicates the current week at which we are making a prediction of the target, $\bar{A}_{i=d}$ indicates the history of hospitalization rates through week $d$, $\bar{X}_{i=d}$ indicates the history of cumulative hospitalization rates through week $d$, and $\bar{T}(i)$ indicates derived variables to capture time trends and/or proposed interactions between variables. Each beta coefficient topped with an arrow and including a lowercase subscript indicates the vector of coefficients implied by the corresponding variable history. The notation above does not incorporate basis functions for splines, kernels, penalties, or other terms that varied across component learners.
 
 ## Component models
 
-We used the same library of component models to build the super learners for all three prediction targets (Table 3). The component models included a standard linear regression model, generalized additive models [@Wood2019-rc], loss-based regression models (e.g., lasso, ridge) [@Tibshirani1996-vt], random forests [@Breiman2001-vm], support vector regression [@Hastie2009-ft], neural networks [@Hastie2009-ft], loess [@Harrell2015-cd], and polynomial multivariate adaptive regression splines (polyMARS) [@Kooperberg2019-ma].
+We used the same library of component models to build the super learners for all three prediction targets (Table 3). The component models included a standard linear regression model, generalized additive models [@Wood2019-rc], loss-based regression models (e.g., lasso, ridge) [@Tibshirani1996-vt], random forests [@Breiman2001-vm], support vector regression [@Hastie2009-ft], neural networks [@Hastie2009-ft], loess [@Harrell2015-cd], and polynomial multivariate adaptive regression splines (polyMARS) [@Kooperberg2019-ma]. Theory and finite-sample demonstrations support the idea that the super learner should benefit from being provided with a large variety of models, even if some of those models perform poorly in the given data [@Van_der_Laan2007-ml]. Therefore, we specified the component learners and tuning parameter sets to attempt to probe a large portion of the component model space.
 
-In all cases the learning algorithms incorporating these various component models were implemented using native functions provided in the `sl3` [@Coyle2020-ze] and `SuperLearner` [@Polley2019-sl] packages in R.
+In all cases the learning algorithms incorporating these various component models were implemented using functions provided in the `sl3` [@Coyle2020-ze] and `SuperLearner` [@Polley2019-sl] packages in R.
 
 
 ```{r candmodels-tuning-table}
@@ -409,7 +394,7 @@ We implemented several loss-based regression learners using the `glmnet` package
 
 ### Random forests
 
-We implemented random forest alogirthms [@Breiman2001-vm] using the `randomForest` package [@Liaw2018-fe], tuning parameters governing the number of regression trees and minimum observations allowed in terminal nodes (Table 3).
+We implemented random forest algorithms [@Breiman2001-vm] using the `randomForest` package [@Liaw2018-fe], tuning parameters governing the number of regression trees and minimum observations allowed in terminal nodes (Table 3).
 
 ### Support vector regression
 
@@ -436,10 +421,9 @@ The super learner algorithm was implemented on a high-performance computing clus
 
 ## Peak rate
 
-For the peak rate prediction target, the ensemble superlearner exhibited [XXXXXXXXX] (Table 4). Throughout the flu season, the discrete super learner (best-performing component model) consistently exhibited a lower average risk than a prediction based on the mean, indicating better predictive ability. Furthermore, the discrete super learner's cross-validated risk generally decreased as the season progressed. In each week a different discrete super learner was selected, with neural networks and penalized regressions being selected in the first several weeks, support vector regressions being selected toward the middle of the flu season, and polyMARS being selected more frequently toward the end of the season.
+For the peak rate prediction target, the ensemble super learner produced risk estimates similar to the simple mean prediction and generally worse than the discrete super learner (Table 4). Throughout the flu season, the discrete super learner (best-performing component model) consistently exhibited a lower average risk than a prediction based on the mean, indicating better predictive ability. Furthermore, the discrete super learner's cross-validated risk generally decreased as the season progressed. In each week a different discrete super learner was selected, with neural networks and penalized regressions being selected in the first several weeks, support vector regressions being selected toward the middle of the flu season, and polyMARS being selected more frequently toward the end of the season.
 
 ```{r risks-datadir}
-results_output <- "C:/Users/jason/Documents/Github/FluHospPrediction/results/paper_output"
 
 risktab_cnames <- c(
   Week = "Week",
@@ -464,7 +448,7 @@ risktab_cnames_word <- function(dat) {
 
 ```{r tab04-peakrate-risk-table}
 
-pkrate_risks <- fread(file.path(results_output, "table-04_peakrate-risks.csv"))
+pkrate_risks <- fread(file.path(assetdir, "table-04_peakrate-risks.csv"))
 
 cap <- "Cross-validated risks for the ensemble super learner, discrete super learner, and simple mean predictions of peak hospitalization rate, by week of influenza season. Estimates presented as mean risk (standard error)."
 
@@ -507,7 +491,7 @@ For the peak week prediction target, the ensemble superlearner generally produce
 
 ```{r tab05-peakweek-risk-table}
 
-pkweek_risks <- fread(file.path(results_output, "table-05_peakweek_risks.csv"))
+pkweek_risks <- fread(file.path(assetdir, "table-05_peakweek_risks.csv"))
 
 cap <- "Cross-validated risks for the ensemble super learner, discrete super learner, and mean predictions of the week in which the peak hospitalization rate occurs, by week of influenza season. Estimates presented as mean risk (standard error)."
 
@@ -549,7 +533,7 @@ For the cumulative hospitalizations prediction target, the ensemble super learne
 
 ```{r tab06-cumhosp-risk-table}
 
-cumhosp_risks <- fread(file.path(results_output, "table-06_cumhosp_risks.csv"))
+cumhosp_risks <- fread(file.path(assetdir, "table-06_cumhosp_risks.csv"))
 
 cap <- "Cross-validated risks for the ensemble super learner, discrete super learner, and mean predictions of the cumulative hospitalization rate, by week of influenza season. Estimates presented as mean risk (standard error)."
 
@@ -590,7 +574,7 @@ if (knitr::is_latex_output()) {
 
 In our study, we found that discrete super learners were consistently better at predicting median peak rate, peak week, and cumulative hospitalizations compared to a simple mean prediction when fit to a distribution of hypothetical influenza hospitalization curves. On the contrary, the ensemble super learner generally tended to perform comparably to a simple mean prediction and consistently worse than the discrete super learners with respect to cross-validated risk. In fact, the discrete super learner routinely provided the best predictions (lowest mean cross-validated risk) across all prediction targets. The discrete super learner also appeared to provide greater improvements over the simple mean prediction as a season wore on, a result that comports with similar findings in the domain of influenza-like illness [@Ray2018-ef]. 
 
-The relative underperformance of the ensemble super learner, a feature observed across all predictions targets, raises several questions regarding the likely usefulness of the super learner algorithm in the context of predicting influenza hospitalizations. It may be that the ensemble super learner should not be relied upon if used to generate in-season forecasts given the small sample size of observed hospitalization curves [@Centers_for_Disease_Control_and_Prevention_undated-vt] and the fact that we did not observe improvements in prediction in a sample size of 15,000. As discussed in the introduction, the ensemble super learner has desirable asymptotic oracle properties, theoretically guaranteed to preform as well as the discrete super learner [@Van_der_Laan2007-ml]. Furthermore, the ensemble super learner is generally assumed not to be affected adversely by the inclusion of poor algorithms or overfitting, as the cross-validation procedure should result in a final weighted ensemble that assigns low or no weight to poor-performing predictions [@Polley2011-oz]. It is possible that adding additional algorithms such as gradient boosted models or exploring a larger range of tuning parameters for the models incorporated in our analysis would have improved the performance of the ensemble learner.
+The relative underperformance of the ensemble super learner, a feature observed across all prediction targets, raises several questions regarding the likely usefulness of the super learner algorithm in the context of predicting influenza hospitalizations. It may be that the ensemble super learner should not be relied upon if used to generate in-season forecasts given the small sample size of observed hospitalization curves [@Centers_for_Disease_Control_and_Prevention_undated-vt] and the fact that we did not observe improvements in prediction in a sample size of 15,000. As discussed in the introduction, the ensemble super learner has desirable asymptotic oracle properties, theoretically guaranteed to preform as well as the discrete super learner [@Van_der_Laan2007-ml]. Furthermore, the ensemble super learner is generally assumed not to be affected adversely by the inclusion of poor algorithms or overfitting, as the cross-validation procedure should result in a final weighted ensemble that assigns low or no weight to poor-performing predictions [@Polley2011-oz]. It is possible that adding additional algorithms such as gradient boosted models or exploring a larger range of tuning parameters for the models incorporated in our analysis would have improved the performance of the ensemble learner.
 
 Our findings should be interpreted in light of several limitations. 
 
@@ -604,11 +588,11 @@ Fourth, we did not model hospitalization rate time series explicitly, in order t
 
 Finally, because we focused on predicting hospitalizations due to seasonal influenza, these findings do not have implications for predicting hospitalizations during years in which a pandemic influenza strain is circulating.
 
-The super learner remains a promising algorithm for predicting influenza-related hospitalizations, but future work should determine the proper breadth of component learners such that the ensemble learner can be relied upon to perform as well as the discrete super learner. Adapting this approach to incorporate empirical surveillance data as well as other data relevant to influenza dynamics (e.g., viral activity, weather patterns) may also be fruitful avenues for future research. 
+The super learner remains a promising algorithm for predicting influenza-related hospitalizations, but future work should determine the proper breadth of component learners such that the ensemble learner can be relied upon to perform as well as the discrete super learner. Adapting this approach to incorporate empirical surveillance data as well as other data relevant to influenza dynamics (e.g., viral activity, weather patterns), and to focus on hospitalizations from specific settings (e.g., skilled nursing facilities), may also be fruitful avenues for future research. 
 
 # Software and code
 
-The code necessary to reproduce these results and the output from the super learner procedures are provided in a repository at Open Science Framework (doi: XXXXXXXXX). These materials are also housed permanently at the Brown Digital Repository (doi/url: XXXXXXXXXXX), and the package can be installed directly via the Github repository ([https://www.github.com/jrgant/FluHospPrediction](https://www.github.com/jrgant/FluHospPrediction)).
+The code necessary to reproduce these results and the output from the super learner procedures are provided in a repository at Open Science Framework **(doi: XXXXXXXXX)**. These materials are also housed permanently at the Brown Digital Repository **(doi/url: XXXXXXXXXXX)**, and the package can be installed directly via the Github repository ([https://www.github.com/jrgant/FluHospPrediction](https://www.github.com/jrgant/FluHospPrediction)).
 
 # Declarations
 
@@ -650,7 +634,7 @@ if (knitr::is_latex_output()) {
 **S2 Table. Number of simulated curves based on each observed flu season (Emerging Infections Program).**
 
 ```{r s2table}
-tmpcts <- fread(file.path(results_output, "table-s02_template-counts.csv"))
+tmpcts <- fread(file.path(assetdir, "table-s02_template-counts.csv"))
 
 if (knitr::is_latex_output()) {
   tmpcts %>%
@@ -669,11 +653,19 @@ if (knitr::is_latex_output()) {
 
 \newpage
 \noindent
-**S3 Table. Weekly cross-validated risks across the component learners used to predict peak hospitalization rate per 100,000 population.**
+**S3 Figure. Simulated hospitalization curves generated based on each empirical shape template.**  Note that because each parameter used in the curve-generating function was drawn independently, simulated hospitalization curves based on an empirical shape template should have a similar shape (i.e., unimodal, bimodal) but may have very different peak and/or cumulative hospitalization rates compared to the empirical template.
 
-```{r s3table-peakrate-meanrisk}
+```{r s3-fig-tempsimplot}
+knitr::include_graphics(file.path(assetdir, "tempsim_plot.png"))
+```
 
-rpsum <- fread(file.path(results_output, "table-s03_risk-distbyweek-pkrate.csv"))
+\newpage
+\noindent
+**S4 Table. Weekly cross-validated risks across the component learners used to predict peak hospitalization rate per 100,000 population.**
+
+```{r s4table-peakrate-meanrisk}
+
+rpsum <- fread(file.path(assetdir, "table-s04_risk-distbyweek-pkrate.csv"))
 
 if (knitr::is_latex_output()) {
   rpsum %>%
@@ -685,7 +677,10 @@ if (knitr::is_latex_output()) {
 } else {
   rpsum %>%
     flextable(cwidth = c(0.6, rep(1.15, 5))) %>%
-    colformat_num(digits = 2) %>%
+    colformat_num(
+      j = 2:6,
+      digits = 2
+    ) %>%
     bold(., part = "header")
 }
 
@@ -693,11 +688,11 @@ if (knitr::is_latex_output()) {
 
 \newpage
 \noindent
-**S4 Table. Weekly cross-validated risks across the component learners used to predict peak week.**
+**S5 Table. Weekly cross-validated risks across the component learners used to predict peak week.**
 
-```{r s4table-peakweek-meanrisk}
+```{r s5table-peakweek-meanrisk}
 
-rwsum <- fread(file.path(results_output, "table-s04_risk-distbyweek-pkweek.csv"))
+rwsum <- fread(file.path(assetdir, "table-s05_risk-distbyweek-pkweek.csv"))
 
 if (knitr::is_latex_output()) {
   rwsum %>%
@@ -709,7 +704,10 @@ if (knitr::is_latex_output()) {
 } else {
   rwsum %>%
     flextable(cwidth = c(0.6, rep(1.15, 5))) %>%
-    colformat_num(digits = 2) %>%
+    colformat_num(
+      j = 2:6,
+      digits = 2
+    ) %>%
     bold(., part = "header")
 }
 
@@ -717,11 +715,11 @@ if (knitr::is_latex_output()) {
 
 \newpage
 \noindent
-**S5 Table. Weekly cross-validated risks across the component learners used to predict cumulative hospitalization rate per 100,000 population.**
+**S6 Table. Weekly cross-validated risks across the component learners used to predict cumulative hospitalization rate per 100,000 population.**
 
-```{r s5table-cumhosp-meanrisk}
+```{r s6table-cumhosp-meanrisk}
 
-rwsum <- fread(file.path(results_output, "table-s05_risk-distbyweek-cumhosp.csv"))
+rwsum <- fread(file.path(assetdir, "table-s06_risk-distbyweek-cumhosp.csv"))
 
 if (knitr::is_latex_output()) {
   rwsum %>%
@@ -733,11 +731,46 @@ if (knitr::is_latex_output()) {
 } else {
   rwsum %>%
     flextable(cwidth = c(0.6, rep(1.15, 5))) %>%
-    colformat_num(digits = 2) %>%
+    colformat_num(
+      j = 2:6,
+      digits = 2
+    ) %>%
     bold(., part = "header")
 }
 
 ```
+
+\newpage
+\noindent
+**S7 Figure. Peak rate, ensemble learner weights as a function of log mean cross-validated risk.** Ensemble learner weights are assigned by regressing the prediction target on corresponding predictions made by each component learner. The coefficients estimated for each independent predictor (i.e., component learner) represent the weight given to the learner's predictions in the final ensemble super learner prediction.
+
+```{r s7fig-risks-weights}
+
+knitr::include_graphics(file.path(assetdir, "pkrate_rw_plot.png"))
+
+```
+
+\newpage
+\noindent
+**S8 Figure. Peak week, ensemble learner weights as a function of log mean cross-validated risk.** Ensemble learner weights are assigned by regressing the prediction target on corresponding predictions made by each component learner. The coefficients estimated for each independent predictor (i.e., component learner) represent the weight given to the learner's predictions in the final ensemble super learner prediction.
+
+```{r s8fig-risks-weights}
+
+knitr::include_graphics(file.path(assetdir, "pkweek_rw_plot.png"))
+
+```
+
+
+\newpage
+\noindent
+**S9 Figure. Cumulative hospitalizations, ensemble learner weights as a function of log mean cross-validated risk.** Ensemble learner weights are assigned by regressing the prediction target on corresponding predictions made by each component learner. The coefficients estimated for each independent predictor (i.e., component learner) represent the weight given to the learner's predictions in the final ensemble super learner prediction.
+
+```{r s9fig-risks-weights}
+
+knitr::include_graphics(file.path(assetdir, "cumhosp_rw_plot.png"))
+
+```
+
 
 \newpage
 
