@@ -1,0 +1,86 @@
+---
+title: "Supplement to: Predicting seasonal influenza hospitalization using an ensemble super learner: a simulation study"
+
+bibliography: references.bib
+csl: plos.csl
+
+always_allow_html: true
+---
+
+Jason R. Gantenberg,(1,2) Kevin W. McConeghy,(2,3) Chanelle J. Howe,(4) Jon Steingrimsson,(5) Robertus van Aalst,(6,7), Ayman Chit,(6,8), Andrew R. Zullo(1,2,3)
+
+
+**Corresponding author:** Jason R. Gantenberg (jrgant@brown.edu)
+
+1. Department of Epidemiology, Brown University School of Public Health, 121 S. Main St., Providence, RI, 02912
+
+1. Department of Health Services, Policy and Practice, 121 S. Main St., Providence, RI, 02912
+
+1. Providence VA Medical Center, 830 Chalkstone Ave., Providence, RI, 02908
+
+1. Center for Epidemiology and Environmental Health, Brown University School of Public Health, 121 S. Main St., Providence, RI, 02912
+
+1. Department of Biostatistics, Brown University School of Public Health, 121 S. Main St., Providence, RI 02912
+
+1. Sanofi Pasteur, Swiftwater, PA 18370
+
+1. Department of Health Sciences, University of Groningen, University Medical Center Groningen, Groningen, the Netherlands
+
+1. Leslie Dan Faculty of Pharmacy, University of Toronto, Canada
+
+\newpage
+
+# Simulating influenza hospitalization curves
+
+As discussed in the Methods, our curve simulation procedure is adopted based on an approach developed by Brooks et al [@ @Brooks2015-fl]. For each simulated curve, each of the following parameters is sampled randomly and independently of one another:
+
+$$\langle f, \sigma, \nu, \theta, \mu \rangle,$$
+
+where $f$ denotes a randomly selected vector of estimated hospitalization rates based on a linear trend filter fit to empirical season $s$, $\sigma$ denotes the root mean squared error of a linear trend filter fit to randomly sampled season $s'$ and averaged across all weeks, $\nu$ denotes a random draw from the continuous uniform distribution [0.75, 1.25], $\theta$ denotes a random draw from a continuous uniform distribution bounded by the minimum and maximum peak hospitalization rates from the 15 trend filter fits, and $\mu$ denotes a random draw from a continuous uniform distribution bounded by the minimum and maximum peak weeks based on the 15 trend filter fits.
+
+The generating function for the hospitalization rate in week $i$ of simulated season $sim$ is therefore given by:
+
+```{r, results = "asis", echo = FALSE}
+
+cat("$$f^{sim} (i) = \\frac{\\theta}{\\text{max}_j f(j)} \\left[ f \\left( \\frac{i - \\mu}{v} + \\substack{\\text{arg max }{j} \\\\ f(j) } \\right) \\right] + \\epsilon_i, \\epsilon_i \\sim N(0, (\\hat{\\tau}^{s'})^2),$$")
+
+```
+
+where $f(j)$ now denotes the vector of fitted hospitalization rates from the linear trend filter fit (randomly selected shape $f$) and $j$ the integer week for which we want to retrieve the prediction from this fit (where the prediction will be assigned to week $i$ in the final curve). $max_j f(j)$ denotes the peak hospitalization rate from the selected shape, whereas `r  "$\\substack{\\text{arg max }{j} \\\\ f(j) }$"` denotes the week in which this peak occurred. The parameters $\theta$, $\mu$, and $\nu$ follow from their prior description. Finally, we introduce noise for each simulated weekly hospitalization rate based on the selected estimate of $\tau^2$.
+
+The formula above conceals a minor alteration we made in order to retrieve predictions for week *j*. The `genlasso` package requires an identity predictor matrix for fitting the trend filter and selecting its $\lambda$ penalty [@Arnold-2019-gl]. In order to generate predictions for week *j* from the trend filter models, where *j* is a perturbed version of *i*, we translated *j* to indicate the proportion by which to increase or decrease the predicted hospitalization rate for a given week. For instance, say $j = 5.5$ and will be mapped to week $i = 6$ in the simulated curve. The predictor matrix fed to the model in order to get the prediction for *j* would have the value 0.917 in row 6, column 6.
+
+
+# Component models
+
+## Linear regression
+
+For each week of the flu season, we specified a linear regression model that included covariates chosen by a correlation-based screening algorithm [@Friedman2019-uw; @Polley2019-sl] in which covariates with _p_ < 0.10 were entered into the linear regression. The linear model was specified using the `glm()` function in R with a Gaussian error distribution and identity link.
+
+## Penalized regression
+
+We implemented several loss-based regression learners using the `glmnet` package in R [@Friedman2019-uw]. These learners included a learner with the lasso penalty [@Tibshirani1996-vt], a learner with the ridge penalty [@Tibshirani1996-vt], and three versions of the elastic net model [@Friedman2019-uw] using different $\alpha$ penalties. The elastic net model essentially combines elements of the lasso and ridge penalties within the same model [@Friedman2019-uw].
+
+## Random forests
+
+We implemented random forest algorithms [@Breiman2001-vm] using the `randomForest` package [@Liaw2018-fe]. We modified tuning parameters governing the number of regression trees grown (i.e., the size of the forest), the  minimum number of observations allowed in terminal nodes, and the number of covariates used to determine sample splits.
+
+## Support vector regression
+
+We implemented several support vector regressions [@Hastie2009-ft] using the `e1071` package [@Meyer2019-gr]---one using a radial kernel and three others using a polynomial kernel of differing degrees.
+
+## Neural networks
+
+We implemented several neural networks [@Hastie2009-ft] using the `nnet` package [@Ripley2020-ds]. All learners proposed contained a single hidden layer, altering tuning parameters governing the number of nodes in this hidden layer and the magnitude of decay applied to node weights.
+
+## LOESS
+
+We submitted several LOESS-based learners as implemented in base R, varying the smoothing kernel span. 
+
+## Polynomial multivariate adaptive regression splines
+
+We submitted several polyMARS models using the `polspline` package [@Kooperberg2019-ma], varying the generalized cross-validation value, larger values of which produce smaller models [@Kooperberg2019-ma].
+
+# References
+
+\bibliography{references}
