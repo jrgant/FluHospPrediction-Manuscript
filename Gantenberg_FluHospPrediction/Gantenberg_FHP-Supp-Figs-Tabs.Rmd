@@ -1,0 +1,247 @@
+# Supporting information
+
+**S1 Fig. Linear trend filter fits to observed influenza hospitalization curves ($\lambda_{min}$).** 
+\bigskip
+
+```{r tfpred-lmin, fig.width=6, fig.height=7.5}
+
+include_graphics(
+  get_asset("FIG", "TF-Predictions_lambda.min")
+)
+
+```
+
+\newpage
+\noindent
+**S2 Table. Number of simulated curves based on each observed flu season (Emerging Infections Program).**
+
+```{r simtemplate-counts}
+tmpcts <- fread(get_asset("TAB", "Simulation-Template-Counts"))
+
+tmpcts %>%
+  flextable %>%
+  bold(part = "header") %>%
+  autofit
+
+```
+\newpage
+\noindent
+**S3 Appendix. Additional methods.**
+
+[see file]
+
+\newpage
+\noindent
+**S4 Table. Weekly cross-validated risks across the component learners used to predict peak hospitalization rate per 100,000 population.**
+
+```{r peakrate-meanrisk}
+
+rpsum <- fread(get_asset("TAB", "Risk-Week_Peak-Rate"))
+
+rpsum %>%
+  flextable(cwidth = c(0.6, rep(1.15, 5))) %>%
+  colformat_num(
+    j = 2:6,
+    digits = 2
+  ) %>%
+  bold(., part = "header") %>%
+  padding(padding = 0, part = "all") %>%
+  font(., fontname = "Times New Roman", part = "all")
+
+
+```
+
+\noindent
+**S5 Table. Weekly cross-validated risks across the component learners used to predict peak week.**
+
+```{r peakweek-meanrisk}
+
+rwsum <- fread(get_asset("TAB", "Risk-Week_Peak-Week"))
+
+rwsum %>%
+  flextable(cwidth = c(0.6, rep(1.15, 5))) %>%
+  colformat_num(
+    j = 2:6,
+    digits = 2
+  ) %>%
+  bold(., part = "header") %>%
+  padding(padding = 0, part = "all") %>%
+  font(., fontname = "Times New Roman", part = "all")
+```
+
+\noindent
+**S6 Table. Weekly cross-validated risks across the component learners used to predict cumulative hospitalization rate per 100,000 population.**
+
+```{r cumhosp-meanrisk}
+
+rwsum <- fread(get_asset("TAB", "Risk-Week_Cum-Hosp"))
+
+rwsum %>%
+  flextable(cwidth = c(0.6, rep(1.15, 5))) %>%
+  colformat_num(
+    j = 2:6,
+    digits = 2
+  ) %>%
+  bold(., part = "header") %>%
+  padding(padding = 0, part = "all") %>%
+  font(., fontname = "Times New Roman", part = "all")
+```
+
+\noindent
+
+**S7 Figure. Peak rate, ensemble learner weights as a function of log mean cross-validated risk.** Ensemble learner weights are assigned by regressing the prediction target on corresponding predictions made by each component learner. The coefficients estimated for each independent predictor (i.e., component learner) represent the weight given to the learner's predictions in the final ensemble super learner prediction, as assigned by the metalearner. In addition, LOESS learners frequently returned warnings due possibly to sparsity in the data but still returned predictions to which the metalearner sometimes assigned non-zero weights. As such, we elected not to drop these models from the analysis.
+
+```{r pkrate-risktiles}
+
+knitr::include_graphics(get_asset("FIG", "Risktiles_Peak-Rate"))
+
+```
+
+\newpage
+\noindent
+**S8 Figure. Peak week, ensemble learner weights as a function of log mean cross-validated risk.** Ensemble learner weights are assigned by regressing the prediction target on corresponding predictions made by each component learner. The coefficients estimated for each independent predictor (i.e., component learner) represent the weight given to the learner's predictions in the final ensemble super learner prediction, assigned by the metalearner. In addition, LOESS learners frequently returned warnings due possibly to sparsity in the data but still returned predictions to which the metalearner sometimes assigned non-zero weights. As such, we elected not to drop these models from the analysis.
+
+```{r pkweek-risktiles, out.width = "100%"}
+
+knitr::include_graphics(get_asset("FIG", "Risktiles_Peak-Week"))
+
+```
+
+\newpage
+\noindent
+
+**S9 Figure. Cumulative hospitalizations, ensemble learner weights as a function of log mean cross-validated risk.** Ensemble learner weights are assigned by regressing the prediction target on corresponding predictions made by each component learner. The coefficients estimated for each independent predictor (i.e., component learner) represent the weight given to the learner's predictions in the final ensemble super learner prediction, assigned by the metalearner. In addition, LOESS learners frequently returned warnings due possibly to sparsity in the data but still returned predictions to which the metalearner sometimes assigned non-zero weights. As such, we elected not to drop these models from the analysis.
+
+```{r cumhosp-risktiles}
+
+knitr::include_graphics(get_asset("FIG", "Risktiles_Cum-Hosp"))
+
+```
+\newpage
+\noindent
+**S10 Fig. Linear trend filter fits to observed influenza hospitalization curves using the $\lambda_{SE}$ penalty (sensitivity analysis).** 
+
+\bigskip
+
+```{r tfpred-lse, fig.width=6, fig.height=7.5}
+
+include_graphics(
+  get_asset("FIG", "TF-Predictions_lambda.1se")
+)
+
+```
+
+\newpage
+\noindent
+**S11 Table. Cross-validated risks for the ensemble super learner, discrete super learner, and simple mean predictions of peak hospitalization rate, by week of influenza season ($\lambda_{SE}$ sensitivity analysis). Estimates presented as mean risk (standard error).**
+
+```{r peakrate-risk-table-1se}
+
+pkrate_risks <- fread(get_asset("TAB", "Risks-EDSL-Mean_PeakRate-L1SE"))
+
+fn <- "The ensemble super learner (EnsembleSL) is the prediction generated as a weighted combination of component model predictions. The discrete super learner (DSL) is the best-performing component model. The super learner was optimized to minimize the absolute error loss and, hence, the prediction error for the median peak hospitalization rate."
+
+pkrate_risks %>%
+  flextable(
+    cwidth = c(0.6, rep(1.1, 3))
+  ) %>%
+  risktab_cnames_word() %>%
+  bold(., part = "header") %>%
+  add_footer_lines(fn) %>%
+  font(., fontname = "Times New Roman", part = "all")
+```
+
+\newpage
+\noindent
+**S12 Table. Cross-validated risks for the ensemble super learner, discrete super learner, and mean predictions of the week in which the peak hospitalization rate occurs, by week of influenza season ($\lambda_{SE}$ sensitivity analysis). Estimates presented as mean risk (standard error).**
+
+```{r peakweek-risk-table-1se}
+
+pkweek_risks <- fread(get_asset("TAB", "Risks-EDSL-Mean_PeakWeek-L1SE"))
+
+fn <- c("The ensemble super learner (EnsembleSL) is the prediction generated as a weighted combination of component model predictions. The discrete super learner (DSL) is the best-performing component model. The super learner was optimized to minimize the absolute error loss and, hence, the prediction error for the median week during which the peak hospitalization rate occurred.")
+
+pkweek_risks %>%
+  flextable(
+    cwidth = c(0.6, rep(1.1, 3))
+  ) %>%
+  risktab_cnames_word() %>%
+  bold(., part = "header") %>%
+  add_footer_lines(fn) %>%
+  font(., fontname = "Times New Roman", part = "all")
+```
+
+\newpage
+\noindent
+**S13 Table. Cross-validated risks for the ensemble super learner, discrete super learner, and mean predictions of the cumulative hospitalization rate, by week of influenza season ($\lambda_{SE}$ sensitivity analysis). Estimates presented as mean risk (standard error).**
+
+```{r cumhosp-risk-table-1se}
+
+cumhosp_risks <- fread(get_asset("TAB", "Risks-EDSL-Mean_CumHosp-L1SE"))
+
+fn <- c("The ensemble super learner (EnsembleSL) is the prediction generated as a weighted combination of component model predictions. The discrete super learner (DiscreteSL) is the best-performing component model. The mean (Mean) is the average cumulative hospitalization rate per 100,000 population across the 15,000 simulated hospitalization curves. The super learner was optimized to minimize the absolute error loss and, hence, the prediction error for the median cumulative hospitalization rate.")
+
+
+cumhosp_risks %>%
+  flextable(
+    cwidth = c(0.6, rep(1.1, 3))
+  ) %>%
+  risktab_cnames_word() %>%
+  bold(., part = "header") %>%
+  add_footer_lines(fn) %>%
+  font(., fontname = "Times New Roman", part = "all")
+
+```
+
+\newpage
+\noindent
+
+**S14 Fig. Peak rate, ensemble learner weights as a function of log mean cross-validated risk ($\lambda_{SE}$ sensitivity analysis).** Ensemble learner weights are assigned by regressing the prediction target on corresponding predictions made by each component learner. The coefficients estimated for each independent predictor (i.e., component learner) represent the weight given to the learner's predictions in the final ensemble super learner prediction, assigned by the metalearner. Missing tiles in the figure indicate a model that was dropped by the algorithm due to failure to fit. In addition, LOESS learners frequently returned warnings due possibly to sparsity in the data but still returned predictions to which the metalearner sometimes assigned non-zero weights. As such, we elected not to drop these models from the analysis.
+
+```{r pkrate-risktiles-1se}
+
+knitr::include_graphics(get_asset("FIG", "Risktiles_Peak-Rate-L1SE"))
+
+```
+
+\newpage
+\noindent
+**S15 Fig. Ensemble and component learner risks at each week of the simulated flu season, peak hospitalization rate (per 100,000 population) prediction target ($\lambda_{SE}$ sensitivity analysis).**
+
+```{r ensemble-perf-pkrate-1se}
+knitr::include_graphics(get_asset("FIG", "Ensemble-Summary_Peak-Rate-L1SE"))
+```
+
+\newpage
+\noindent
+**S16 Fig. Peak week, ensemble learner weights as a function of log mean cross-validated risk ($\lambda_{SE}$ sensitivity analysis).** Ensemble learner weights are assigned by regressing the prediction target on corresponding predictions made by each component learner. The coefficients estimated for each independent predictor (i.e., component learner) represent the weight given to the learner's predictions in the final ensemble super learner prediction, assigned by the metalearner. Missing tiles in the figure indicate a model that was dropped by the algorithm due to failure to fit. In addition, LOESS learners frequently returned warnings due possibly to sparsity in the data but still returned predictions to which the metalearner sometimes assigned non-zero weights. As such, we elected not to drop these models from the analysis.
+
+```{r pkweek-risktiles-1se}
+
+knitr::include_graphics(get_asset("FIG", "Risktiles_Peak-Week-L1SE"))
+
+```
+\newpage
+\noindent
+**S17 Fig. Ensemble and component learner risks at each week of the simulated flu season, peak week prediction target ($\lambda_{SE}$ sensitivity analysis).**
+
+```{r ensemble-perf-pkweek-1se}
+knitr::include_graphics(get_asset("FIG", "Ensemble-Summary_Peak-Week-L1SE"))
+```
+
+\newpage
+\noindent
+
+**S18 Fig. Cumulative hospitalizations, ensemble learner weights as a function of log mean cross-validated risk ($\lambda_{SE}$ sensitivity analysis).** Ensemble learner weights are assigned by regressing the prediction target on corresponding predictions made by each component learner. The coefficients estimated for each independent predictor (i.e., component learner) represent the weight given to the learner's predictions in the final ensemble super learner prediction, assigned by the metalearner. Missing tiles in the figure indicate a model that was dropped by the algorithm due to failure to fit. In addition, LOESS learners frequently returned warnings due possibly to sparsity in the data but still returned predictions to which the metalearner sometimes assigned non-zero weights. As such, we elected not to drop these models from the analysis.
+
+```{r cumhosp-risktiles-1se}
+knitr::include_graphics(get_asset("FIG", "Risktiles_Cum-Hosp-L1SE"))
+```
+
+\newpage
+\noindent
+**S19 Fig. Ensemble and component learner risks at each week of the simulated flu season, cumulative hospitalization rate (per 100,000 population) prediction target ($\lambda_{SE}$ sensitivity analysis).**
+
+```{r ensemble-perf-cumhosp-1se}
+knitr::include_graphics(get_asset("FIG", "Ensemble-Summary_Cum-Hosp-L1SE"))
+```
