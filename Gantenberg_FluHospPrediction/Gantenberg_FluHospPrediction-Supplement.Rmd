@@ -63,7 +63,7 @@ We implemented several loss-based regression learners using the `glmnet` package
 
 ## Random forests
 
-We implemented random forest algorithms [@Breiman2001-vm] using the `randomForest` package [@Liaw2018-fe]. We modified tuning parameters governing the number of regression trees grown (i.e., the size of the forest), the  minimum number of observations allowed in terminal nodes, and the number of covariates used to determine sample splits.
+We implemented random forest algorithms [@Breiman2001-vm] using the `randomForest` package [@Liaw2018-fe]. We modified tuning parameters governing the number of regression trees grown (i.e., the size of the forest), the  minimum number of observations allowed in terminal nodes, and the number of covariates selected for splitting in each tree.
 
 ## Support vector regression
 
