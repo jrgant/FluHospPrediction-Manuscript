@@ -9,7 +9,10 @@ always_allow_html: true
 
 ```{r, include = FALSE}
 library(officer)
-sfp <- fp_text(font.family = "NimbusRomNo9L-Reg", vertical.align = "superscript")
+sfp <- fp_text(
+  font.family = "Times New Roman",
+  vertical.align = "superscript"
+)
 ```
 
 Jason R. Gantenberg`r ftext("1,2", sfp)`\*, Kevin W. McConeghy`r ftext("2,3", sfp)`, Chanelle J. Howe`r ftext("4", sfp)`, Jon Steingrimsson`r ftext("5", sfp)`, Robertus van Aalst`r ftext("6,7", sfp)`, Ayman Chit`r ftext("6,8", sfp)`, Andrew R. Zullo`r ftext("1,2,3", sfp)`
@@ -383,7 +386,7 @@ We repeated the following procedure for each prediction target:
    c. c.	Create a linear combination of the individual learners where the weights are selected by minimizing the absolute error [@Van_der_Laan2007-ml; @Naimi2018-fv]. The model that assigns each component learner its weights is referred to as the "metalearner" [@Coyle2020-ze].
    d. Calculate the cross-validated risk for the ensemble super learner as in step 3a.
 
-In all, we trained 76 component models for each prediction target and within each week of the season. This total includes variations within classes of learners achieved by perturbing various tuning and input parameters \@ref(tab:candmodels-tuning-table). The metalearner was specified using the `sl3` [@Coyle2020-ze] package's implementation of the `solnp` function from the `Rsolnp` package [@Ghalanos2015-sn]. 
+In all, we trained 76 component models for each prediction target and within each week of the season. This total includes variations within classes of learners achieved by perturbing various tuning and input parameters (**Table \@ref(tab:candmodels-tuning-table)**). The metalearner was specified using the `sl3` [@Coyle2020-ze] package's implementation of the `solnp` function from the `Rsolnp` package [@Ghalanos2015-sn]. 
 
 
 ## Component models
