@@ -48,11 +48,11 @@ E-mail: jrgant@brown.edu (JRG)
     
 # Abstract
 
-Accurate forecasts of influenza epidemics can inform public health response to outbreaks. To date, most efforts in influenza forecasting have focused on predicting influenza-like activity. Fewer have sought to predict other features of seasonal influenza epidemics, such as influenza-related hospitalizations. We conducted a simulation study to explore the potential for a machine-learning algorithm (super learner) to predict three seasonal measures of influenza hospitalizations at the national level in the United States: the peak hospitalization rate, the week this peak hospitalization rate occurs, and the cumulative hospitalization rate. We trained a super learner on 15,000 simulated influenza hospitalization curves to generate predictions at each week of the season for these seasonal prediction targets. For each week, we compared the performance of the ensemble super learner (a weighted combination of predictions from a set of individual prediction algorithms), the discrete super learner (the best-performing individual prediction algorithm), and a naive prediction based on the median of a given outcome (e.g., median peak hospitalization rate). For the peak hospitalization rate prediction target, we found that the super learner algorithm consistently identified individual prediction algorithms that improved upon a prediction using the median of the outcome distribution. We found that the ensemble predictions in general performed slightly better than the median prediction late in the flu season for the peak hospitalization rate outcome and comparably earlier in the season. While the discrete super learner during this period of the season typically exhibited substantially lower prediction error than the ensemble super learner, the component model selected as the discrete super learner varied by week. In contrast, the ensemble performed stably throughout the flu season. For the peak week outcome, the ensemble super learner's predictions exhibited slightly lower prediction error than the naive median prediction. For the cumulative hospitalization rate outcome, the ensemble super learner performed comparably to the median prediction across all weeks, while individual discrete super learners exhibited lower prediction error than the naive prediction, particularly late in the flu season. This study suggests that the super learner may be a useful tool for predicting influenza hospitalizations. Future work should examine the super learner's performance using empirical data and additional influenza-related indicators such as influenza-like-illness and viral activity. Whether the super learner is most useful for selecting an individual prediction algorithm versus producing ensemble predictions may vary by context: determining which uses of the super learner, if any, might improve in-season forecasting of influenza hospitalizations should be the focus of future applied investigations.
+Accurate forecasts of influenza epidemics can inform public health response to outbreaks. To date, most efforts in influenza forecasting have focused on predicting influenza-like activity. Fewer have sought to predict other features of seasonal influenza epidemics, such as influenza-related hospitalizations. We conducted a simulation study to explore the potential for a machine-learning algorithm (super learner) to predict three seasonal measures of influenza hospitalizations at the national level in the United States: the peak hospitalization rate, the week this peak hospitalization rate occurs, and the cumulative hospitalization rate. We trained a super learner on 15,000 simulated influenza hospitalization curves to generate predictions at each week of the season for these seasonal prediction targets. For each week, we compared the performance of the ensemble super learner (a weighted combination of predictions from a set of individual prediction algorithms), the discrete super learner (the best-performing individual prediction algorithm), and a naive prediction based on the median of a given outcome (e.g., median peak hospitalization rate). For the peak hospitalization rate prediction target, we found that the super learner algorithm consistently identified individual prediction algorithms that improved upon a prediction using the median of the outcome distribution. We found that the ensemble predictions in general performed slightly better than the median prediction late in the flu season for the peak hospitalization rate outcome and comparably earlier in the season. While the discrete super learner typically exhibited substantially lower prediction error than the ensemble super learner late in the flu season, the component model selected as the discrete super learner varied by week. In contrast, the ensemble performed stably throughout the flu season. For the peak week outcome, the ensemble super learner's predictions exhibited slightly lower prediction error than the naive median prediction. For the cumulative hospitalization rate outcome, the ensemble super learner performed comparably to the median prediction across all weeks, while individual discrete super learners exhibited lower prediction error than the naive prediction, particularly late in the flu season. This study suggests that the super learner may be a useful tool for predicting influenza hospitalizations. Future work should examine the super learner's performance using empirical data and additional influenza-related indicators such as influenza-like-illness and viral activity. Whether the super learner is most useful for selecting an individual prediction algorithm versus producing ensemble predictions may vary by context: determining which uses of the super learner, if any, might improve in-season forecasting of influenza hospitalizations should be the focus of future applied investigations.
 
 # Author Summary
 
-While influenza prediction is a still-maturing science, the past decade has seen notable improvements in predicting influenza-like activity. Machine-learning approaches may further improve the predictive accuracy of influenza forecasts. However, predicting influenza-related hospitalizations has received somewhat less attention. Using a machine-learning approach called the _super learner_, we examined the potential ability of this machine-learning approach to predict several features of influenza hospitalization dynamics that could help public health authorities and institutions allocate their efforts and resources more effectively during a flu season. The super learner is capable of taking a large number of prediction algorithms (e.g., statistical models) and either combining them into a single prediction (the ensemble prediction) or choosing the best-performing algorithm. Our results suggest that ensemble super learner predictions may not perform as well as the best-performing prediction algorithm in any given season but do provide predictions with generally stable performance across a set of simulated flu seasons. Future work should explore approaches, such as incorporating empirical data on indicators of influenza transmission or modifying the prediction algorithms presented to the super learner, that might either improve the performance of super learner ensembles or guide appropriate application(s) of the super learner for predicting influenza hospitalizations.
+While influenza prediction is a still-maturing science, the past decade has seen notable improvements in predicting influenza-like activity. Machine-learning approaches may further improve the predictive accuracy of influenza forecasts. However, predicting influenza-related hospitalizations has received somewhat less attention. Using a machine-learning approach called the _super learner_, we examined the potential ability of this machine-learning approach to predict several features of influenza hospitalization dynamics that could help public health authorities and institutions allocate their efforts and resources more effectively during a flu season. The super learner is capable of taking a large number of prediction algorithms (e.g., statistical models) and either combining them into a single prediction (the ensemble prediction) or choosing the best-performing algorithm. Our results suggest that ensemble super learner predictions may not perform as well as the best-performing prediction algorithm in any given week of a flu season but do provide predictions with generally stable performance across a set of simulated flu seasons. Future work should explore approaches, such as incorporating empirical data on indicators of influenza transmission or modifying the prediction algorithms presented to the super learner, that might either improve the performance of super learner ensembles or guide appropriate application(s) of the super learner for predicting influenza hospitalizations.
 
 \newpage
 
@@ -93,7 +93,7 @@ assetdir <-
 global_table_font <- "NimbusRomNo9L-Reg"
 
 # function to get a set of files based on their creation date
-global_date <- "2020-08-20"     # set accordingly
+global_date <- "2020-09-19"     # set accordingly
 
 get_asset <- function(type, descr, date = global_date) {
 
@@ -117,18 +117,23 @@ prop_weeks_transformed <- readRDS(
 
 # Set up supplemental material numbering/labeling
 
-## This function makes a caption for the prediction risk tables in the supplement.
-rttab_cap <- function(target, analysis) {
+## This function makes a caption for the component prediction risk
+## distribution tables in the supplement.
+rttab_cap <- function(target, analysis, component = FALSE) {
   rateslug <- "hospitalization rate per 100,000 population"
   texts <- c(
     "Peak rate" = paste("peak", rateslug),
     "Peak week" = "peak week",
     "Cumulative hospitalizations" = paste("cumulative", rateslug))
   t <- match(target, names(texts))
-  
+
+  if (component) {
   paste0(
-    "Weekly cross-validated risks across the component learners used to predict ", texts[t], " (", analysis, " analysis). Estimates presented as mean (standard error)."
+    "Weekly risks across all component learners used to predict ", texts[t], " (", analysis, " analysis). Estimates presented as summary statistics across cross-validation folds. SD, standard deviation."
   )
+  } else {
+    paste0("Cross-validated risks for the ensemble and discrete super learner predictions of ", texts[t], ", by week of influenza season (", analysis, " analysis). Estimates presented as mean (standard error).")
+  }
 }
 
 # This function makes the footnote for a prediction risk table.
@@ -225,9 +230,9 @@ supp <- data.table(
     tf_cap("main"),
     "Number of simulated curves based on each observed flu season (Emerging Infections Program).",
     "Additional methods.",
-    rttab_cap("Peak rate", mainslug),
-    rttab_cap("Peak week", mainslug),
-    rttab_cap("Cumulative hospitalizations", mainslug),
+    rttab_cap("Peak rate", mainslug, component = TRUE),
+    rttab_cap("Peak week", mainslug, component = TRUE),
+    rttab_cap("Cumulative hospitalizations", mainslug, component = TRUE),
     rtfig_cap("Peak rate", mainslug),
     rtfig_cap("Peak week", mainslug),
     rtfig_cap("Cumulative hospitalizations", mainslug),
@@ -376,9 +381,9 @@ We repeated the following procedure for each prediction target:
    a. Train each learner on the data set using 15-fold cross-validation and calculate its cross-validated risk as the average prediction risk across the 15 validation sets.
    b. Generate predictions using each component learner in the full data set.
    c. c.	Create a linear combination of the individual learners where the weights are selected by minimizing the absolute error [@Van_der_Laan2007-ml; @Naimi2018-fv]. The model that assigns each component learner its weights is referred to as the "metalearner" [@Coyle2020-ze].
-   d. Calculate the cross-validated risk for the ensemble super learner as in step 4a.
+   d. Calculate the cross-validated risk for the ensemble super learner as in step 3a.
 
-In all, we trained 80 component models for each prediction target and within each week of the season. This total includes variations within classes of learners achieved by perturbing various tuning and input parameters \@ref(tab:candmodels-tuning-table). The metalearner was specified using the `sl3` [@Coyle2020-ze] package's implementation of the `solnp` function from the `Rsolnp` package [@Ghalanos2015-sn]. 
+In all, we trained 76 component models for each prediction target and within each week of the season. This total includes variations within classes of learners achieved by perturbing various tuning and input parameters \@ref(tab:candmodels-tuning-table). The metalearner was specified using the `sl3` [@Coyle2020-ze] package's implementation of the `solnp` function from the `Rsolnp` package [@Ghalanos2015-sn]. 
 
 
 ## Component models
@@ -486,7 +491,7 @@ presl_num <- get_risks(pkrate_risks, "SuperLearner")
 prdsl_num <- get_risks(pkrate_risks, "DiscreteSL")
 ```
 
-For the peak rate prediction target, the ensemble super learner produced risk estimates similar to the median prediction (**Table \@ref(tab:peakrate-risk-table)**). Throughout the flu season, the discrete super learner (best-performing component model) consistently exhibited a lower cross-validated risk than both the median prediction and the ensemble super learner, indicating better predictive ability in general. Furthermore, the discrete super learner's cross-validated risk generally decreased as the season progressed. However, the component models selected as the  discrete super learner varied by week, while the ensemble super learner's risk remained quite stable throughout the simulated flu season, and began to improve slightly over the median prediction late in the flu season (**Table \@ref(tab:peakrate-risk-table), Fig \@ref(fig:ensemble-perf-main)**). The ensemble predictions for the peak hospitalization rate exhibited median prediction risks ranging between `r min(presl_num)` and `r max(presl_num)` per 100,000 population across the flu season. (**Fig \@ref(fig:ensemble-perf-regscale)**). For the discrete super learner, these risks ranged between `r min(prdsl_num)` and `r max(prdsl_num)` per 100,000 population.
+For the peak rate prediction target, the ensemble super learner produced risk estimates similar to the median prediction (**Table \@ref(tab:peakrate-risk-table)**). Throughout the flu season, the discrete super learner (best-performing component model) consistently exhibited a lower cross-validated risk than both the median prediction and the ensemble super learner, indicating better predictive ability in general. Furthermore, the discrete super learner's cross-validated risk generally decreased as the season progressed. However, the component models selected as the  discrete super learner varied by week, while the ensemble super learner's risk remained quite stable throughout the simulated flu season, and began to improve slightly over the median prediction late in the flu season (**Table \@ref(tab:peakrate-risk-table), Fig \@ref(fig:ensemble-perf-main)**). The ensemble predictions for the peak hospitalization rate exhibited mean prediction risks ranging between `r min(presl_num)` and `r max(presl_num)` per 100,000 population across the flu season. (**Fig \@ref(fig:ensemble-perf-regscale)**). For the discrete super learner, these risks ranged between `r min(prdsl_num)` and `r max(prdsl_num)` per 100,000 population.
 
 
 ```{r risks-datadir}
@@ -608,7 +613,7 @@ chdsl_num_erf <- get_risks(cumhosp_risks_erf, "DiscreteSL")
 
 **Component learner subset.** The ensemble learner trained using a subset of component learners that included only the elastic net and random forest learners tended to produce mean prediction risks consistently lower than those of the naive median prediction across the flu season (**Fig \@ref(fig:ensemble-perf-regscale)**). We observed this general pattern across all prediction targets. For the peak rate and cumulative hospitalization prediction targets, the ensemble's prediction risks also appeared to improve later in the season, generally at or before week 10. 
 
-For the peak rate prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(presl_num_erf)` and `r max(presl_num_erf)` per 100,000 population and the discrete super learner's between `r min(prdsl_num_erf)` and `r max(presl_num_erf)` per 100,000 population. For the peak week prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(pwesl_num_erf)` and `r max(pwesl_num_erf)` weeks and the discrete super learner's between `r min(pwdsl_num_erf)` and `r max(pwdsl_num_erf)` weeks. For the cumulative hospitalization prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(chesl_num_erf)` and `r max(chesl_num_erf)` per 100,000 populationand the discrete super learner's between `r min(chdsl_num_erf)` and `r max(chdsl_num_erf)` per 100,000 population.
+For the peak rate prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(presl_num_erf)` and `r max(presl_num_erf)` per 100,000 population and the discrete super learner's between `r min(prdsl_num_erf)` and `r max(presl_num_erf)` per 100,000 population. For the peak week prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(pwesl_num_erf)` and `r max(pwesl_num_erf)` weeks and the discrete super learner's between `r min(pwdsl_num_erf)` and `r max(pwdsl_num_erf)` weeks. For the cumulative hospitalization prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(chesl_num_erf)` and `r max(chesl_num_erf)` per 100,000 population and the discrete super learner's between `r min(chdsl_num_erf)` and `r max(chdsl_num_erf)` per 100,000 population.
 
 ```{r sen-sqe-setup}
 pkrate_risks_sqe <- fread(get_asset("TAB", "Risks-EDSL-Mean_PeakRate-SQE"))
@@ -635,7 +640,7 @@ knitr::include_graphics(get_asset("FIG", "Ensemble-Summary_All-Targets-SQE"))
 
 # Discussion
 
-In our study, we found that discrete super learners were consistently better at predicting median peak rate, peak week, and cumulative hospitalizations compared to a naive prediction based on the outcome median when fit to a distribution of hypothetical influenza hospitalization curves. The discrete super learner's predictions also improved over the course of the season compared to the median prediction, which comports with prior research in influenza-like illness prediction [@Ray2018-ef]. While rarely matching the performance of the discrete super learner, the ensemble super learner in the main analysis nevertheless exhibited stable cross-validated risk across the course of the flu season for all prediction targets. In general, the ensemble performed comparably to the median prediction and, for the peak rate prediction target, somewhat better than the median prediction late in the season. The magnitude of this improvement was small, however, amounting to an improvement in the prediction of the peak rate around 2 hospitalizations per 100,000 population. 
+In our study, we found that discrete super learners were consistently better at predicting median peak rate, peak week, and cumulative hospitalizations compared to a naive prediction based on the outcome median when fit to a distribution of hypothetical influenza hospitalization curves. The discrete super learner's predictions also improved over the course of the season compared to the median prediction, a pattern that comports with prior research in influenza-like illness prediction [@Ray2018-ef]. While rarely matching the performance of the discrete super learner, the ensemble super learner in the main analysis nevertheless exhibited stable cross-validated risk across the course of the flu season for all prediction targets. In general, the ensemble performed comparably to the median prediction and, for the peak rate prediction target, somewhat better than the median prediction late in the season. The magnitude of this improvement was small, however, amounting to an improvement in the prediction of the peak rate around 2 hospitalizations per 100,000 population. 
 
 We also found the ensemble estimates tended to balance the performance of the various component learners, avoiding extreme prediction errors. Theory suggests that the ensemble super learner is generally assumed not to be affected adversely by the inclusion of poor algorithms or overfitting, as the cross-validation procedure should result in a final weighted ensemble that assigns low or no weight to poor-performing predictions [@Polley2010-cb; @Polley2011-oz]. We did find the super learner assigned weights to prediction algorithms that appeared to affect the ensemble's predictive performance adversely. Nonetheless, the ensemble predictions in the main analysis produced generally consistent risk estimates across the flu season, which might be a desirable property in its own right, particularly in contexts when little information exists to guide a priori  selection of component learners. 
 
@@ -651,7 +656,7 @@ Third, we did not include several types of models that might have improved the e
 
 Fourth, our approach to simulating hypothetical influenza hospitalization curves used only information on hospitalization rates. As a consequence, we were unable to examine whether incorporating other influenza-related surveillance data (e.g., ILI, viral activity [@Centers_for_Disease_Control_and_Prevention_undated-vt]) or climate data  may have improved the super learner's predictions.
 
-Finally, we focused our analysis on a simulated distribution of season influenza hospitalization curves. Pandemic influenza hospitalizations follow different dynamics, and our results likely do not apply to influenza pandemics. However, ensemble forecasting may become an increasingly important tool during infectious disease pandemics in general (e.g., the ongoing SARS-CoV-2 pandemic [@CovidHub-2020-fh]).
+Finally, we focused our analysis on a simulated distribution of seasonal influenza hospitalization curves. Pandemic influenza hospitalizations follow different dynamics, and our results likely do not apply to influenza pandemics. However, ensemble forecasting may become an increasingly important tool during infectious disease pandemics in general (e.g., the ongoing SARS-CoV-2 pandemic [@CovidHub-2020-fh]).
 
 Our study found that an ensemble super learner, provided only with information about influenza-related hospitalization rates, was capable of producing predictions of stable quality throughout the flu season in a distribution of simulated hospitalization curves. Future work should focus on investigating the super learner's performance in empirical data sets, incorporating additional information (e.g., data on influenza-like illness, viral activity, and climate), and translating the approach to generate in-season forecasts that comply with CDC FluSight Network formats and guidelines. In addition, applying the super learner to predict influenza hospitalizations at the regional and state levels, rather than simply at the national level, may be a promising avenue for improving the quality of information available to public health and medical institutions tasked with responding proactively to changes in health care needs during a seasonal flu epidemic.
 
@@ -719,7 +724,7 @@ supp_cap("")
 cat("\n\nSee supplemental appendix file.")
 ```
 \newpage
-
+\newpage
 
 <!-- SUPPLEMENTAL TABLE -->
 
