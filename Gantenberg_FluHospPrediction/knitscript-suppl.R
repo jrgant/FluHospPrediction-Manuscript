@@ -1,6 +1,9 @@
 library(rmarkdown)
 
 render(
-  "Gantenberg_FluHospPrediction-Supplement.Rmd",
-  output_format = "pdf_document"
+  "FHP-Supplement.Rmd",
+  output_format = "officedown::rdocx_document",
+  output_options = list(
+    reference_docx = "wordref-suppl.docx"
+  )
 )
