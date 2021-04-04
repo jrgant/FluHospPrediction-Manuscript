@@ -1,0 +1,63 @@
+---
+title: "Predicting seasonal influenza hospitalizations using an ensemble super learner: a simulation study"
+---
+
+```{r, include = FALSE}
+library(officer)
+sfp <- fp_text(
+  font.family = "Times New Roman",
+  vertical.align = "superscript"
+)
+```
+
+Jason R. Gantenberg`r ftext("1,2", sfp)`\*, Kevin W. McConeghy`r ftext("2,3", sfp)`, Chanelle J. Howe`r ftext("4", sfp)`, Jon Steingrimsson`r ftext("5", sfp)`, Robertus van Aalst`r ftext("6,7", sfp)`, Ayman Chit`r ftext("6,8", sfp)`, Andrew R. Zullo`r ftext("1,2,3", sfp)`
+
+`r ftext("1", sfp)` Department of Epidemiology, Brown University School of Public Health, Providence, RI
+
+`r ftext("2", sfp)` Department of Health Services, Policy and Practice, Providence, RI
+
+`r ftext("3", sfp)` Providence VA Medical Center, Providence, RI
+
+`r ftext("4", sfp)` Center for Epidemiology and Environmental Health, Brown University School of Public Health, Providence, RI
+
+`r ftext("5", sfp)` Department of Biostatistics, Brown University School of Public Health, Providence, RI
+
+`r ftext("6", sfp)` Sanofi Pasteur, Swiftwater, PA
+
+`r ftext("7", sfp)` Department of Health Sciences, University Medical Center Groningen, University of Groningen, Groningen, the Netherlands
+
+`r ftext("8", sfp)` Leslie Dan Faculty of Pharmacy, University of Toronto, Ontario, Canada
+
+
+## Conflicts of interest
+
+KWM receives funding support from Seqirus pharmaceuticals and conducts investigator-initiated work for Pfizer.
+  
+## Funding
+
+This Brown University collaborative research was funded by Sanofi Pasteur (PI: ARZ). ARZ was also supported, in part, by grants R21AG061632 and R01AG065722 from the National Institute on Aging and U54GM115677 from the National Institute of General Medical Sciences. In addition, ARZ was supported by a US Department of Veterans Affairs Office of Academic Affiliations Advanced Fellowship in Health Services Research and Development.
+
+## Corresponding author
+
+Jason R. Gantenberg \
+Department of Epidemiology \
+Department of Health Services, Policy and Practice \
+Brown University School of Public Health \
+Providence, RI 02912 \
+E-mail: jrgant@brown.edu
+
+## Acknowledgment
+
+We would like to thank Ashley Naimi, Laura Balzer, and Nicholas Reich for their helpful comments concerning the study aims and the super learner approach, as well as Edward Thommes for his comments on a draft of the manuscript. The super learner algorithm was fit using computational resources and services provided by the Center for Computation and Visualization at Brown University.
+
+## Disclaimer
+
+The views expressed in this article are those of the authors and do not necessarily reflect the position or policy of the Department of Veterans Affairs or the United States Government.
+\newpage
+
+\newpage
+## Software and code
+
+The code necessary to reproduce these results and the output from the super learner procedures are provided in a repository at Open Science Framework **(doi: XXXXXXXXX)**. These materials are also housed permanently at the Brown Digital Repository **(doi/url: XXXXXXXXXXX)**, and the package can be installed directly via the Github repository ([https://www.github.com/jrgant/FluHospPrediction](https://www.github.com/jrgant/FluHospPrediction)).
+
+\newpage
