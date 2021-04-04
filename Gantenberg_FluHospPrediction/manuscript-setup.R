@@ -128,7 +128,7 @@ tf_cap <- function(analysis) {
 supp <- data.table(
   type = c(
     ## Main analysis
-    "Figure", "Table", "Table", "Table", "Table",
+    "Figure", "Table", "Figure", "Table", "Table", "Table",
     "Figure", "Figure", "Figure",
     ## Alternate trend filter penalty
     "Figure", "Table", "Table", "Table", "Figure", "Figure", "Figure",
@@ -141,6 +141,7 @@ supp <- data.table(
     ## Main analysis
     "TF-Predictions_lambda.min",
     "Simulation-Template-Counts",
+    "Simulation-Curves-by-Template",
     "Risk-Week_Peak-Rate",
     "Risk-Week_Peak-Week",
     "Risk-Week_Cum-Hosp",
@@ -174,7 +175,8 @@ supp <- data.table(
   cap = c(
     ## Main analysis
     tf_cap("main"),
-    "Number of simulated curves based on each observed flu season (Emerging Infections Program).",
+    "Number of simulated curves based on each empirical shape template (Emerging Infections Program).",
+    "**Ten random simulated hospitalization curves, by empirical shape template.** All simulated curves were based on linear trend filter fits using the $\\lambda_{min}$ trend filter penalty. Note that because each parameter used in the curve-generating function was drawn independently, simulated hospitalization curves based on an empirical shape template should have a similar shape (i.e., unimodal, bimodal) but may have different peak and/or cumulative hospitalization rates compared to the empirical template. Empirical data source: CDC, Emerging Infections Program (omitting 2009--2010 pandemic influenza season).",
     rttab_cap("Peak rate", mainslug, component = TRUE),
     rttab_cap("Peak week", mainslug, component = TRUE),
     rttab_cap("Cumulative hospitalizations", mainslug, component = TRUE),

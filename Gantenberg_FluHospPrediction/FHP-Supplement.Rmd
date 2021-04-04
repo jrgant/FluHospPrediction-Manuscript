@@ -192,6 +192,14 @@ tmpcts %>%
 ```
 \newpage
 
+<!-- SUPPLEMENTAL FIGURE -->
+
+```{r supp-simtemplate-rand, results = "asis", fig.asp = 1800/2250}
+slug <- "Simulation-Curves-by-Template-Rand10"
+supp_cap(slug)
+include_graphics(get_asset("FIG", slug))
+```
+
 <!-- SUPPLEMENTAL TABLE -->
 
 ```{r supp-peakrate-meanrisk, results = "asis"}
