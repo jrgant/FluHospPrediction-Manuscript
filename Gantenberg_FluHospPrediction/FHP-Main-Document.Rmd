@@ -117,7 +117,7 @@ We estimated the predictive accuracy of the component models and ensemble learne
 We repeated the following procedure for each prediction target:
 
 1. Create 30 data sets, one for each week of the flu season, containing the outcome variables and predictors described previously.
-1. Assign each observation to a fold for use in cross-validation. Each weekly dataset contained 15,000 rows, one for each simulated influenza hospitalization curve. (See "Accounting for Dependence" in the *Supplemental Appendix* for more information.)
+1. Assign each observation to a fold for use in cross-validation. Each weekly dataset contained 15,000 rows, one for each simulated influenza hospitalization curve. To account for the lack of independence between curves, we assigned all simulated curves based on the same empirical shape template to the same fold (e.g., all curves based on the trend filter fit to season 2004-05). We did not account for potential dependencies due to repeated sampling of the noise term, as we believed the season shape was the more consequential source of dependence. (The noise injected into the simulated curves was typically very small, and the season shape determined the number of peaks in a simulated curve.)
 1. Execute the super learner algorithm:
    a. Train each learner on the data set using 15-fold cross-validation and calculate its cross-validated risk as the average prediction risk across the 15 validation sets.
    b. Generate predictions using each component learner in the full data set.

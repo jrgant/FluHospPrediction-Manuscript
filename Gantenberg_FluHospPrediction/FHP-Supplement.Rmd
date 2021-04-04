@@ -97,9 +97,6 @@ We submitted several LOESS-based learners as implemented in base R, varying the 
 We submitted several polyMARS models using the `polspline` package [@Kooperberg2019-ma], varying the generalized cross-validation value, larger values of which produce smaller models [@Kooperberg2019-ma].
 
 
-# Accounting for dependence
-
-To account for the lack of independence between curves, we assigned all simulated curves based on the same empirical season shape to the same fold (e.g., all curves based on the trend filter fit to season 2004-05). We did not account for potential dependencies due to repeated sampling of the noise term, as we believed the season shape was more consequential with respect to inducing dependence between simulated curves. For one, the noise injected into the simulated curves was typically very small. In addition, the season shape is the strongest determinant of how the simulated hospitalization curve changes over time.
 
 # Technical details
 
