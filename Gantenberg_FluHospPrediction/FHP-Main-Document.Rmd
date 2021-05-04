@@ -124,7 +124,7 @@ We repeated the following procedure for each prediction target:
    c. Using predictions made in the validation folds, create a linear weighted combination of the individual learners' predictions via a "metalearner" mode set to optimize the ensemble predictions against the absolute error loss [@Van_der_Laan2007-ml; @Coyle2020-ze; @Naimi2018-fv].
    d. Calculate the cross-validated risk for the ensemble super learner as in step 3a.
 
-We trained 76 component models in all, including variations achieved by perturbing various tuning and input parameters (**Table \@ref(tab:candmodels-tuning-table)**), for each prediction target and within each week of the season. We used the `sl3` [@Coyle2020-ze] package's implementation of the `solnp` function [@Ghalanos2015-sn] as the metalearner. 
+We trained 72 component models in all, including variations achieved by perturbing various tuning and input parameters (**Table \@ref(tab:candmodels-tuning-table)**), for each prediction target and within each week of the season. We used the `sl3` [@Coyle2020-ze] package's implementation of the `solnp` function [@Ghalanos2015-sn] as the metalearner. 
  
 ## Component models
 
