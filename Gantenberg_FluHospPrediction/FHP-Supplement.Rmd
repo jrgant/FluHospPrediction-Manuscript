@@ -15,7 +15,7 @@ Jason R. Gantenberg,(1,2) Kevin W. McConeghy,(2,3) Chanelle J. Howe,(4) Jon Stei
 
 1. Providence VA Medical Center, 830 Chalkstone Ave., Providence, RI, 02908
 
-1. Center for Epidemiology and Environmental Health, Brown University School of Public Health, 121 S. Main St., Providence, RI, 02912
+1. Center for Epidemiologic Research, Brown University School of Public Health, 121 S. Main St., Providence, RI, 02912
 
 1. Department of Biostatistics, Brown University School of Public Health, 121 S. Main St., Providence, RI 02912
 
@@ -31,6 +31,8 @@ Jason R. Gantenberg,(1,2) Kevin W. McConeghy,(2,3) Chanelle J. Howe,(4) Jon Stei
 ```{r include = FALSE}
 source("manuscript-setup.R")
 ```
+
+\newpage
 # Emerging Infections Program
 
 The EIP contains data on influenza-related hospitalizations in California, Colorado, Connecticut, Georgia, Maryland, Minnesota, New Mexico, New York, Oregon, and Tennessee [@Centers_for_Disease_Control_and_Prevention_undated-vt]. Since the 2009--2010 season the FluSurv Network has included between 3 and 6 states in addition to those represented in the EIP data, depending on the year [@Centers_for_Disease_Control_and_Prevention_undated-vt]. To maintain consistency within the empirical data, and to maximize the number of flu seasons available to inform curve simulation, we excluded data from states outside the EIP.
@@ -90,17 +92,18 @@ We implemented several neural networks [@Hastie2009-ft] using the `nnet` package
 
 ## LOESS
 
-We submitted several LOESS-based learners as implemented in base R, varying the smoothing kernel span. 
+We submitted several LOESS-based learners as implemented in base R, varying the smoothing kernel span.
 
 ## Polynomial multivariate adaptive regression splines
 
 We submitted several polyMARS models using the `polspline` package [@Kooperberg2019-ma], varying the generalized cross-validation value, larger values of which produce smaller models [@Kooperberg2019-ma].
 
 
-
 # Technical details
 
-The super learner algorithm was implemented on a high-performance computing cluster housed at the Center for Computation and Visualization at Brown University. Each run was submitted to a large-memory node and parallelized across 32 central processing units using functionality provided in `sl3` [@Coyle2020-ze] via the `delayed` [@Coyle2020-rq] and `future` [@Bengtsson2020-oz] packages in R. In general, running the super learner algorithm required between (roughly) 30--60 minutes per week across all prediction targets, with approximately 22--24 hours required to conduct a complete set of computing jobs for a single prediction target. 
+The super learner algorithm was implemented on a high-performance computing cluster housed at the Center for Computation and Visualization at Brown University. Each run was submitted to a large-memory node and parallelized across 32 central processing units using functionality provided in `sl3` [@Coyle2020-ze] via the `delayed` [@Coyle2020-rq] and `future` [@Bengtsson2020-oz] packages in R 3.6.3. In general, running the super learner algorithm required between (roughly) 30--60 minutes per week across all prediction targets, with approximately 22--24 hours required to conduct a complete set of computing jobs for a single prediction target. Super learners trained on observed data were parallelized across 16 processors.
+
+Data visualization and summarization were conducted in R 4.0.5, while curve simulations were conducted in R versions greater than or equal to 3.6.3.
 
 # Ethics statement
 
@@ -124,7 +127,7 @@ chesl_num_1se <- get_risks(cumhosp_risks_1se, "SuperLearner")
 chdsl_num_1se <- get_risks(cumhosp_risks_1se, "DiscreteSL")
 ```
 
-For the peak rate prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(presl_num_1se)` and `r max(presl_num_1se)` per 100,000 population and the discrete super learner's between `r min(prdsl_num_1se)` and `r max(presl_num_1se)` per 100,000 population. For the peak week prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(pwesl_num_1se)` and `r max(pwesl_num_1se)` weeks and the discrete super learner's between `r min(pwdsl_num_1se)` and `r max(pwdsl_num_1se)` weeks. For the cumulative hospitalization prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(chesl_num_1se)` and `r max(chesl_num_1se)` per 100,000 population and the discrete super learner's ranged between `r min(chdsl_num_1se)` and `r max(chdsl_num_1se)` per 100,000 population.
+For the peak rate prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(presl_num_1se)` and `r max(presl_num_1se)` per 100,000 population and the discrete super learner's between `r min(prdsl_num_1se)` and `r max(presl_num_1se)` per 100,000 population. For the peak week prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(pwesl_num_1se)` and `r max(pwesl_num_1se)` weeks and the discrete super learner's between `r min(pwdsl_num_1se)` and `r max(pwdsl_num_1se)` weeks. For the cumulative rate prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(chesl_num_1se, na.rm = TRUE)` and `r max(chesl_num_1se, na.rm = TRUE)` per 100,000 population and the discrete super learner's ranged between `r min(chdsl_num_1se, na.rm = TRUE)` and `r max(chdsl_num_1se, na.rm = TRUE)` per 100,000 population.
 
 ## Component learner subset
 
@@ -142,11 +145,12 @@ chesl_num_erf <- get_risks(cumhosp_risks_erf, "SuperLearner")
 chdsl_num_erf <- get_risks(cumhosp_risks_erf, "DiscreteSL")
 ```
 
-For the peak rate prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(presl_num_erf)` and `r max(presl_num_erf)` per 100,000 population and the discrete super learner's between `r min(prdsl_num_erf)` and `r max(presl_num_erf)` per 100,000 population. For the peak week prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(pwesl_num_erf)` and `r max(pwesl_num_erf)` weeks and the discrete super learner's between `r min(pwdsl_num_erf)` and `r max(pwdsl_num_erf)` weeks. For the cumulative hospitalization prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(chesl_num_erf)` and `r max(chesl_num_erf)` per 100,000 population and the discrete super learner's between `r min(chdsl_num_erf)` and `r max(chdsl_num_erf)` per 100,000 population.
+For the peak rate prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(presl_num_erf)` and `r max(presl_num_erf)` per 100,000 population and the discrete super learner's between `r min(prdsl_num_erf)` and `r max(prdsl_num_erf)` per 100,000 population. For the peak week prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(pwesl_num_erf)` and `r max(pwesl_num_erf)` weeks and the discrete super learner's between `r min(pwdsl_num_erf)` and `r max(pwdsl_num_erf)` weeks. For the cumulative rate prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(chesl_num_erf)` and `r max(chesl_num_erf)` per 100,000 population and the discrete super learner's between `r min(chdsl_num_erf)` and `r max(chdsl_num_erf)` per 100,000 population.
 
 ## Squared error loss
 
 ```{r sen-sqe-setup}
+
 pkrate_risks_sqe <- fread(get_asset("TAB", "Risks-EDSL-Mean_PeakRate-SQE"))
 presl_num_sqe <- get_risks(pkrate_risks_sqe, "SuperLearner")
 prdsl_num_sqe <- get_risks(pkrate_risks_sqe, "DiscreteSL")
@@ -160,7 +164,7 @@ chesl_num_sqe <- get_risks(cumhosp_risks_sqe, "SuperLearner")
 chdsl_num_sqe <- get_risks(cumhosp_risks_sqe, "DiscreteSL")
 ```
 
-For the peak rate prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(presl_num_sqe)` and `r max(presl_num_sqe)` per 100,000 population and the discrete super learner's between `r min(prdsl_num_sqe)` and `r max(presl_num_sqe)` per 100,000 population. For the peak week prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(pwesl_num_sqe)` and `r max(pwesl_num_sqe)` weeks and the discrete super learner's between `r min(pwdsl_num_sqe)` and `r max(pwdsl_num_sqe)` weeks. For the cumulative hospitalization prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(chesl_num_sqe)` and `r max(chesl_num_sqe)` per 100,000 population and the discrete super learner's between `r min(chdsl_num_sqe)` and `r max(chdsl_num_sqe)` per 100,000 population.
+For the peak rate prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(presl_num_sqe)` and `r max(presl_num_sqe)` per 100,000 population and the discrete super learner's between `r min(prdsl_num_sqe)` and `r max(presl_num_sqe)` per 100,000 population. For the peak week prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(pwesl_num_sqe)` and `r max(pwesl_num_sqe)` weeks and the discrete super learner's between `r min(pwdsl_num_sqe)` and `r max(pwdsl_num_sqe)` weeks. For the cumulative rate prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(chesl_num_sqe, na.rm = TRUE)` and `r max(chesl_num_sqe, na.rm = TRUE)` per 100,000 population and the discrete super learner's between `r min(chdsl_num_sqe, na.rm = TRUE)` and `r max(chdsl_num_sqe, na.rm = TRUE)` per 100,000. We omit Week 30 from the reported ranges for the cumulative rate because at that point, the true outcome is known.
 
 
 \newpage 
@@ -199,25 +203,28 @@ slug <- "Simulation-Curves-by-Template-Rand10"
 supp_cap(slug)
 include_graphics(get_asset("FIG", slug))
 ```
+\newpage
+
+```{r format-riskdist-cols}
+rdcols <- c("Mean", "SD", "Median", "Minimum", "Maximum")
+roundit <- function(x) round(x, 2)
+```
 
 <!-- SUPPLEMENTAL TABLE -->
 
 ```{r supp-peakrate-meanrisk, results = "asis"}
 slug <- "Risk-Week_Peak-Rate"
-rpsum <- fread(get_asset("TAB", slug))
+rwsum_pr <- fread(get_asset("TAB", slug))
+
+## round numeric columns
 
 supp_cap(slug)
 
-rpsum %>%
+rwsum_pr[, (rdcols) := lapply(.SD, roundit), .SDcols = rdcols][] %>%
   flextable(cwidth = c(0.6, rep(1.15, 5))) %>%
-  colformat_num(
-    j = 2:6,
-    digits = 2
-  ) %>%
   bold(., part = "header") %>%
   padding(padding = 0, part = "all") %>%
   font(., fontname = global_table_font, part = "all")
-
 ```
 \newpage
 
@@ -225,16 +232,14 @@ rpsum %>%
 
 ```{r supp-peakweek-meanrisk, results = "asis"}
 slug <- "Risk-Week_Peak-Week"
-rwsum <- fread(get_asset("TAB", slug))
+rwsum_pw <- fread(get_asset("TAB", slug))
+
+## round numberic columns
 
 supp_cap(slug)
 
-rwsum %>%
+rwsum_pw[, (rdcols) := lapply(.SD, roundit), .SDcols = rdcols][] %>%
   flextable(cwidth = c(0.6, rep(1.15, 5))) %>%
-  colformat_num(
-    j = 2:6,
-    digits = 2
-  ) %>%
   bold(., part = "header") %>%
   padding(padding = 0, part = "all") %>%
   font(., fontname = global_table_font, part = "all")
@@ -245,16 +250,13 @@ rwsum %>%
 
 ```{r supp-cumhosp-meanrisk, results = "asis"}
 slug <- "Risk-Week_Cum-Hosp"
-rwsum <- fread(get_asset("TAB", slug))
+rwsum_ch <- fread(get_asset("TAB", slug))
+
 
 supp_cap(slug)
 
-rwsum %>%
+rwsum_ch[, (rdcols) := lapply(.SD, roundit), .SDcols = rdcols][] %>%
   flextable(cwidth = c(0.6, rep(1.15, 5))) %>%
-  colformat_num(
-    j = 2:6,
-    digits = 2
-  ) %>%
   bold(., part = "header") %>%
   padding(padding = 0, part = "all") %>%
   font(., fontname = global_table_font, part = "all")
@@ -433,7 +435,7 @@ cumhosp_risks %>%
   ) %>%
   risktab_cnames_word() %>%
   bold(., part = "header") %>%
-  add_footer_lines(risktabfn("Cumulative hospitalizations")) %>%
+  add_footer_lines(risktabfn("Cumulative rate")) %>%
   font(., fontname = global_table_font, part = "all")
 ```
 \newpage
@@ -518,20 +520,19 @@ cumhosp_risks %>%
   ) %>%
   risktab_cnames_word() %>%
   bold(., part = "header") %>%
-  add_footer_lines(risktabfn("Cumulative hospitalizations", sqe = TRUE)) %>%
+  add_footer_lines(risktabfn("Cumulative rate", sqe = TRUE)) %>%
   font(., fontname = global_table_font, part = "all")
 ```
 \newpage
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-
-```{r fig.id="ensemble-perf-sqe", results = "asis", fig.width = 4.8, fig.asp = 3000/1800}
+```{r fig.id="ensemble-perf-sqe", results = "asis", fig.width = 6, fig.asp = 4000/4000}
 slug <- "Ensemble-Summary_All-Targets-SQE"
 supp_cap(slug)
 knitr::include_graphics(get_asset("FIG", "Ensemble-Summary_All-Targets-SQE"))
 ```
-
+\newpage
 
 <!-- SUPPLEMENTAL FIGURE -->
 
