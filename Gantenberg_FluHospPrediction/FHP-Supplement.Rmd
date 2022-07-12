@@ -115,15 +115,15 @@ This manuscript involves only the use of publicly available influenza surveillan
 
 ```{r sen-l1se-setup}
 pkrate_risks_1se <- fread(get_asset("TAB", "Risks-EDSL-Mean_PeakRate-L1SE"))
-presl_num_1se <- get_risks(pkrate_risks_1se, "SuperLearner")
+presl_num_1se <- get_risks(pkrate_risks_1se, "SuperLearnerCV")
 prdsl_num_1se <- get_risks(pkrate_risks_1se, "DiscreteSL")
 
 pkweek_risks_1se <- fread(get_asset("TAB", "Risks-EDSL-Mean_PeakWeek-L1SE"))
-pwesl_num_1se <- get_risks(pkweek_risks_1se, "SuperLearner")
+pwesl_num_1se <- get_risks(pkweek_risks_1se, "SuperLearnerCV")
 pwdsl_num_1se <- get_risks(pkweek_risks_1se, "DiscreteSL")
 
 cumhosp_risks_1se <- fread(get_asset("TAB", "Risks-EDSL-Mean_CumHosp-L1SE"))
-chesl_num_1se <- get_risks(cumhosp_risks_1se, "SuperLearner")
+chesl_num_1se <- get_risks(cumhosp_risks_1se, "SuperLearnerCV")
 chdsl_num_1se <- get_risks(cumhosp_risks_1se, "DiscreteSL")
 ```
 
@@ -133,15 +133,15 @@ For the peak rate prediction target, the ensemble super learner's predictions ex
 
 ```{r sen-erf-setup}
 pkrate_risks_erf <- fread(get_asset("TAB", "Risks-EDSL-Mean_PeakRate-ERF"))
-presl_num_erf <- get_risks(pkrate_risks_erf, "SuperLearner")
+presl_num_erf <- get_risks(pkrate_risks_erf, "SuperLearnerCV")
 prdsl_num_erf <- get_risks(pkrate_risks_erf, "DiscreteSL")
 
 pkweek_risks_erf <- fread(get_asset("TAB", "Risks-EDSL-Mean_PeakWeek-ERF"))
-pwesl_num_erf <- get_risks(pkweek_risks_erf, "SuperLearner")
+pwesl_num_erf <- get_risks(pkweek_risks_erf, "SuperLearnerCV")
 pwdsl_num_erf <- get_risks(pkweek_risks_erf, "DiscreteSL")
 
 cumhosp_risks_erf <- fread(get_asset("TAB", "Risks-EDSL-Mean_CumHosp-ERF"))
-chesl_num_erf <- get_risks(cumhosp_risks_erf, "SuperLearner")
+chesl_num_erf <- get_risks(cumhosp_risks_erf, "SuperLearnerCV")
 chdsl_num_erf <- get_risks(cumhosp_risks_erf, "DiscreteSL")
 ```
 
@@ -152,15 +152,15 @@ For the peak rate prediction target, the ensemble super learner's predictions ex
 ```{r sen-sqe-setup}
 
 pkrate_risks_sqe <- fread(get_asset("TAB", "Risks-EDSL-Mean_PeakRate-SQE"))
-presl_num_sqe <- get_risks(pkrate_risks_sqe, "SuperLearner")
+presl_num_sqe <- get_risks(pkrate_risks_sqe, "SuperLearnerCV")
 prdsl_num_sqe <- get_risks(pkrate_risks_sqe, "DiscreteSL")
 
 pkweek_risks_sqe <- fread(get_asset("TAB", "Risks-EDSL-Mean_PeakWeek-SQE"))
-pwesl_num_sqe <- get_risks(pkweek_risks_sqe, "SuperLearner")
+pwesl_num_sqe <- get_risks(pkweek_risks_sqe, "SuperLearnerCV")
 pwdsl_num_sqe <- get_risks(pkweek_risks_sqe, "DiscreteSL")
 
 cumhosp_risks_sqe <- fread(get_asset("TAB", "Risks-EDSL-Mean_CumHosp-SQE"))
-chesl_num_sqe <- get_risks(cumhosp_risks_sqe, "SuperLearner")
+chesl_num_sqe <- get_risks(cumhosp_risks_sqe, "SuperLearnerCV")
 chdsl_num_sqe <- get_risks(cumhosp_risks_sqe, "DiscreteSL")
 ```
 
@@ -560,7 +560,25 @@ supp_cap(slug)
 knitr::include_graphics(get_asset("FIG", slug))
 ```
 
+\newpage
 
+<!-- SUPPLEMENTAL FIGURE -->
+
+```{r supp-prosp-error-compare, results = "asis", fig.asp = 10800/32400}
+slug <- "Prospective-Observed-Error"
+supp_cap(slug)
+knitr::include_graphics(get_asset("FIG", slug))
+```
+
+\newpage 
+
+<!-- SUPPLEMENTAL FIGURE -->
+
+```{r supp-obs-on-sim, results = "asis", fig.asp = 10800/32400}
+slug <- "Observed-Predict-Simulated"
+supp_cap(slug)
+knitr::include_graphics(get_asset("FIG", slug))
+```
 
 \newpage
 # References
