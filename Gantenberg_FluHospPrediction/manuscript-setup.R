@@ -26,20 +26,21 @@ opts_chunk$set(
 
 # paper output directory
 assetdir <-
-  "/mnt/HDD/projects/FluHospPrediction/results/00_paper_output/"
+  "~/HDD/projects/FluHospPrediction/results/00_paper_output/"
 
 # table font
 global_table_font <- "Times New Roman"
 
 # function to get a set of files based on their creation date
-global_date <- "2021-06-07"     # set accordingly
+global_date <- "2022-08-09"     # set accordingly
+simdat_date <- "2022-02-02"
 
-get_asset <- function(type, descr, date = global_date) {
+get_asset <- function(type, descr, date = global_date, pdfout = TRUE) {
 
   if (!type %in% c("FIG", "TAB", "VAL")) stop("Invalid asset type.")
 
   if (type == "FIG") {
-    ext <- "png"
+    ext <- ifelse(pdfout == TRUE, "pdf", "png")
   } else if (type == "TAB") {
     ext <- "csv"
   } else {
@@ -51,7 +52,7 @@ get_asset <- function(type, descr, date = global_date) {
 
 # results objects
 prop_weeks_transformed <- readRDS(
-  get_asset("VAL", "Proportion-Weeks-Transformed")
+  get_asset("VAL", "Proportion-Weeks-Transformed", simdat_date)
 )
 
 # Set up supplemental material numbering/labeling
@@ -71,7 +72,7 @@ rttab_cap <- function(target, analysis, component = FALSE) {
     "Weekly risks across all component learners used to predict ", texts[t], " (", analysis, " analysis). Estimates presented as summary statistics across cross-validation folds. SD, standard deviation."
   )
   } else {
-    paste0("Prediction risks for the ensemble and discrete super learner predictions of ", texts[t], ", by week of influenza season (", analysis, " analysis). Estimates presented as mean (standard error). The risks presented for the discrete super learner are cross-validated, while risks for the ensemble super learner are estimated in the full dataset. Consequently, risks for the ensemble may be optimistic.")
+    paste0("Cross-validated prediction risks for the ensemble and discrete super learner predictions of ", texts[t], ", by week of influenza season (", analysis, " analysis). Estimates presented as mean (standard error).")
   }
 }
 
@@ -95,8 +96,7 @@ risktabfn <- function(target, sqe = FALSE) {
         texts[1], " (peak rate), the ",
         texts[2], " (peak week), and the ",
         texts[3], " (cumulative rate).")
-    ),
-    "The risks presented for the discrete super learner are cross-validated, while risks for the ensemble super learner are estimated in the full dataset. Consequently, risks for the ensemble may be optimistic."
+    )
   )
 }
 
@@ -128,30 +128,37 @@ tf_cap <- function(analysis) {
 
 supp <- data.table(
   type = c(
-    ## Main analysis
+    ## Main analysis methods
     "Figure", "Table", "Figure",
+    ## Alternate trend filter penalty methods
+    "Figure",
+    ## Main analysis results
     "Table", "Table", "Table",
     "Figure", "Figure", "Figure",
-    ## Alternate trend filter penalty
-    "Figure", "Table", "Table", "Table", "Figure", "Figure", "Figure",
+    ## Alternate trend filter penalty results
+    "Table", "Table", "Table", "Figure", "Figure", "Figure",
     ## Component learner subset
     "Table", "Table", "Table", "Figure", "Figure", "Figure",
     ## Squared error loss
-    "Table", "Table", "Table", "Figure", "Figure", "Figure", "Figure"
+    "Table", "Table", "Table", "Figure", "Figure", "Figure", "Figure",
+    ## Observed vs. simulated training data (ensemble error)
+    "Figure", "Figure"
   ),
   file = c(
-    ## Main analysis
+    ## Main analysis methods
     "TF-Predictions_lambda.min",
     "Simulation-Template-Counts",
     "Simulation-Curves-by-Template-Rand10",
+    ## Alternate trend filter penalty methods
+    "TF-Predictions_lambda.1se",
+    ## Main analysis results
     "Risk-Week_Peak-Rate",
     "Risk-Week_Peak-Week",
     "Risk-Week_Cum-Hosp",
     "Risktiles_Peak-Rate",
     "Risktiles_Peak-Week",
     "Risktiles_Cum-Hosp",
-    ## Alternate trend filter penalty
-    "TF-Predictions_lambda.1se",
+    ## Alternate trend filter penalty results
     "Risks-EDSL-Mean_PeakRate-L1SE",
     "Risks-EDSL-Mean_PeakWeek-L1SE",
     "Risks-EDSL-Mean_CumHosp-L1SE",
@@ -172,21 +179,26 @@ supp <- data.table(
     "Ensemble-Summary_All-Targets-SQE",
     "Risktiles_Peak-Rate-SQE",
     "Risktiles_Peak-Week-SQE",
-    "Risktiles_Cum-Hosp-SQE"
+    "Risktiles_Cum-Hosp-SQE",
+    ## comparison of prediction errors, observed vs. training data
+    "Prospective-Observed-Error",
+    "Observed-Predict-Simulated"
   ),
   cap = c(
-    ## Main analysis
+    ## Main analysis methods
     tf_cap("main"),
     "Number of simulated curves based on each empirical shape template (Emerging Infections Program).",
-    "**Ten random simulated hospitalization curves, by empirical shape template.** All simulated curves were based on linear trend filter fits using the $\\lambda_{min}$ trend filter penalty. Note that because each parameter used in the curve-generating function was drawn independently, simulated hospitalization curves based on an empirical shape template should have a similar shape (i.e., unimodal, bimodal) but may have different peak and/or cumulative hospitalization rates compared to the empirical template. Empirical data source: CDC, Emerging Infections Program (omitting 2009--2010 pandemic influenza season).",
+    "Ten random simulated hospitalization curves, by empirical shape template. All simulated curves were based on linear trend filter fits using the $\\lambda_{min}$ trend filter penalty. Note that because each parameter used in the curve-generating function was drawn independently, simulated hospitalization curves based on an empirical shape template should have a similar shape (i.e., unimodal, bimodal) but may have different peak and/or cumulative hospitalization rates compared to the empirical template. Empirical data source: CDC, Emerging Infections Program (omitting 2009--2010 pandemic influenza season).",
+    ## Alternate trend filter penalty methods
+    tf_cap("lse"),
+    ## Main analysis results
     rttab_cap("Peak rate", mainslug, component = TRUE),
     rttab_cap("Peak week", mainslug, component = TRUE),
     rttab_cap("Cumulative rate", mainslug, component = TRUE),
     rtfig_cap("Peak rate", mainslug),
     rtfig_cap("Peak week", mainslug),
     rtfig_cap("Cumulative rate", mainslug),
-    ## Alternate trend filter sensitivity
-    tf_cap("lse"),
+    ## Alternate trend filter penalty results
     rttab_cap("Peak rate", lseslug),
     rttab_cap("Peak week", lseslug),
     rttab_cap("Cumulative rate", lseslug),
@@ -204,21 +216,25 @@ supp <- data.table(
     rttab_cap("Peak rate", sqeslug),
     rttab_cap("Peak week", sqeslug),
     rttab_cap("Cumulative rate", sqeslug),
-    "Ensemble, component learner, and naive mean prediction risks by week of simulated flu season and prediction target (squared error sensitivity analysis). Learners assigned zero weights by the metalearner are omitted. The risks presented for the discrete super learner are cross-validated, while risks for the ensemble super learner are estimated in the full dataset. Consequently, risks for the ensemble may be optimistic. Week 30 omitted from cumulative hospitalization rate to avoid distorting the y-axis; the true cumulative hospitalization rates are known to the algorithm at this point in the season.",
+    "Cross-validated ensemble, component learner, and naive mean prediction risks by week of simulated flu season and prediction target (squared error sensitivity analysis). Learners assigned zero weights by the metalearner are omitted. Week 30 omitted from cumulative hospitalization rate to avoid distorting the y-axis; the true cumulative hospitalization rates are known to the algorithm at this point in the season.",
     rtfig_cap("Peak rate", sqeslug),
     rtfig_cap("Peak week", sqeslug),
-    rtfig_cap("Cumulative rate", sqeslug)
+    rtfig_cap("Cumulative rate", sqeslug),
+    "Cross-validated risks for prospective predictions using ensemble super learners (ESL) trained on observed data (x-axis) and simulated data (y-axis), by prediction target and influenza season. Points falling below the diagonal line indicate higher prediction error for the ESL trained on observed data, while points falling above the diagonal line indicate higher prediction risk for the ESL trained on simulated data.",
+    "Mean cross-validated risks (natural log scale) for ensemble super learners trained on simulated data versus ensemble super learners trained on the 15 observed influenza hospitalization curves when used to predict outcomes on the simulated hospitalization curves. As in the prospective analysis, training the super learner on simulated data appears to improve the stability of the ensemble predictions, avoiding the extreme prediction errors exhibited by ensembles trained only on observed data."
   )
 )
 
-supp[, number := .I]
-supp
+supp[, number := rowid(type)]
+supp[, .(type, number)][order(-type)]
+
 
 ## A function to output a supplemental material caption
 ## as Markdown markup.
 supp_cap <- function(fileslug) {
   info <- supp[file == fileslug]
-  cat(info[, paste0("Supplemental Item ", number, ", ", type, ". ", cap)])
+  cat(info[, paste0("Web ", info[, type], " ",
+                    number, ". ", cap)])
 }
 
 ## A function to output the risk tables.
@@ -226,7 +242,7 @@ risktab_cnames_word <- function(dat) {
   set_header_labels(
     dat,
     Week = "Week",
-    SuperLearner = "EnsembleSL",
+    SuperLearnerCV = "EnsembleSL",
     BestComponent = "DiscreteSL"
   )
 }
@@ -240,15 +256,15 @@ get_risks <- function(data, variable) {
 }
 
 pkrate_risks <- fread(get_asset("TAB", "Risks-EDSL-Mean_PeakRate"))
-presl_num <- get_risks(pkrate_risks, "SuperLearner")
+presl_num <- get_risks(pkrate_risks, "SuperLearnerCV")
 prdsl_num <- get_risks(pkrate_risks, "DiscreteSL")
 
 pkweek_risks <- fread(get_asset("TAB", "Risks-EDSL-Mean_PeakWeek"))
-pwesl_num <- get_risks(pkweek_risks, "SuperLearner")
+pwesl_num <- get_risks(pkweek_risks, "SuperLearnerCV")
 pwdsl_num <- get_risks(pkweek_risks, "DiscreteSL")
 
 cumhosp_risks <- fread(get_asset("TAB", "Risks-EDSL-Mean_CumHosp"))
-chesl_num <- get_risks(cumhosp_risks, "SuperLearner")
+chesl_num <- get_risks(cumhosp_risks, "SuperLearnerCV")
 chdsl_num <- get_risks(cumhosp_risks, "DiscreteSL")
 
 prw_risks <- merge(pkrate_risks, pkweek_risks, by = "Week")

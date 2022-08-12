@@ -1,13 +1,18 @@
 ---
-title: "Supplement to: Predicting seasonal influenza hospitalization using an ensemble super learner: a simulation study"
+title: "Supplement to: Predicting seasonal influenza hospitalizations using an ensemble super learner: a simulation study"
 
 bibliography: references.bib
 csl: american-journal-of-epidemiology.csl
 
 always_allow_html: true
+
+header-includes:
+  - \usepackage{bm}
 ---
 
-Jason R. Gantenberg,(1,2) Kevin W. McConeghy,(2,3) Chanelle J. Howe,(4) Jon Steingrimsson,(5) Robertus van Aalst,(6,7), Ayman Chit,(6,8), Andrew R. Zullo(1,2,3)
+Jason R. Gantenberg^1,2^ Kevin W. McConeghy,^2,3^ Chanelle J. Howe,^4^ Jon Steingrimsson,^5^ Robertus van Aalst,^6,7^, Ayman Chit,^6,8^, Andrew R. Zullo^1,2,3^
+
+\bigskip
 
 1. Department of Epidemiology, Brown University School of Public Health, 121 S. Main St., Providence, RI, 02912
 
@@ -25,31 +30,44 @@ Jason R. Gantenberg,(1,2) Kevin W. McConeghy,(2,3) Chanelle J. Howe,(4) Jon Stei
 
 1. Leslie Dan Faculty of Pharmacy, University of Toronto, Canada
 
-**Corresponding author:** Jason R. Gantenberg (jrgant@brown.edu)
+\bigskip
+**Corresponding author:** \newline\newline
+Jason R. Gantenberg \newline
+Department of Health Services Policy and Practice \newline
+Brown University School of Public Health \newline
+jrgant@brown.edu
+
+\newpage
+\tableofcontents
+
 \newpage
 
-```{r include = FALSE}
+```{r setup, include = FALSE}
 source("manuscript-setup.R")
 ```
 
 \newpage
-# Emerging Infections Program
+# Web Appendix 1
+## Emerging Infections Program
 
 The EIP contains data on influenza-related hospitalizations in California, Colorado, Connecticut, Georgia, Maryland, Minnesota, New Mexico, New York, Oregon, and Tennessee [@Centers_for_Disease_Control_and_Prevention_undated-vt]. Since the 2009--2010 season the FluSurv Network has included between 3 and 6 states in addition to those represented in the EIP data, depending on the year [@Centers_for_Disease_Control_and_Prevention_undated-vt]. To maintain consistency within the empirical data, and to maximize the number of flu seasons available to inform curve simulation, we excluded data from states outside the EIP.
 
 Influenza hospitalization cases reflect individuals hospitalized during the flu season and for whom infection control logs and/or hospital laboratory or admissions data indicated a positive test for influenza [@Centers_for_Disease_Control_and_Prevention_undated-vt]. According to the CDC, a hospitalization's being identified as related to influenza depends upon laboratory tests ordered at the discretion of a physician, suggesting that surveillance statistics probably underestimate the true burden of influenza hospitalization [@Centers_for_Disease_Control_and_Prevention_undated-vt]. Typically, the CDC releases influenza hospitalization data for epiweeks 40--53 and 1--17, corresponding approximately to October through April of the next year [@Centers_for_Disease_Control_and_Prevention_undated-vt; @Centers_for_Disease_Control_and_Prevention_undated-pu]. Epiweeks are integers assigned to each week (beginning on Sunday) of the calendar year, where epiweek 1 is the first week of the calendar year and epiweeks 52/53 the last, depending on leap years [@Centers_for_Disease_Control_and_Prevention_undated-pu]. We renumbered epiweeks falling within the range of influenza hospitalization data as 1--30, omitting epiweek 53, which was present in only 3 of the 15 available empirical seasons. Hereafter we refer to this 30-week period generically as a _flu season_.
 
-# Simulating influenza hospitalization curves
+\newpage
 
-As discussed in the Methods, our curve simulation procedure is adapted from an approach developed by Brooks et al [@ @Brooks2015-fl]. The original curve-generating function was developed to simulate potential ILI curves and, consequently, included a term for season-onset, representing the threshold ILI at which the flu season would be considered to have started [@Brooks2015-fl]. This onset is an additional prediction target in FluSight ILI forecasting because ILI surveillance is conducted year-round. However, such a threshold does not exist for influenza-related hospitalizations because hospitalization rates are recorded starting in epiweek 40 through the end of the flu season and (save for one season) begin at a rate of 0 per 100,000 [@Centers_for_Disease_Control_and_Prevention_undated-vt]. We modified the curve-generating function to omit the seasonal onset term and added a transformation to constrain simulated hospitalization rates to be at least 0. Otherwise, the implementation closely followed the Brooks et al. approach.
+# Web Appendix 2
+## Simulating influenza hospitalization curves
+
+As discussed in the Methods, our curve simulation procedure is adapted from an approach developed by Brooks et al [@Brooks2015-fl]. The original curve-generating function was developed to simulate potential ILI curves and, consequently, included a term for season-onset, representing the threshold ILI at which the flu season would be considered to have started [@Brooks2015-fl]. This onset is an additional prediction target in FluSight ILI forecasting because ILI surveillance is conducted year-round. However, such a threshold does not exist for influenza-related hospitalizations because hospitalization rates are recorded starting in epiweek 40 through the end of the flu season and (save for one season) begin at a rate of 0 per 100,000 [@Centers_for_Disease_Control_and_Prevention_undated-vt]. We modified the curve-generating function to omit the seasonal onset term and added a transformation to constrain simulated hospitalization rates to be at least 0. Otherwise, the implementation closely followed the Brooks et al. approach.
 
 For each simulated curve, each of the following parameters is sampled randomly and independently of one another:
 
-$$\langle f, \sigma, \nu, \theta, \mu \rangle,$$
+$$\langle \bm{f}, \sigma, \nu, \theta, \mu \rangle,$$
 
 where:
 
-- $f$ denotes a randomly selected vector of estimated hospitalization rates based on a linear trend filter fit to empirical season $s$, 
+- **_f_** denotes a randomly selected vector of estimated hospitalization rates based on a linear trend filter fit to empirical season $s$, 
 - $\sigma$ denotes the root mean squared error of a linear trend filter fit to randomly sampled shape template $s'$ and averaged across all weeks, 
 - $\nu$ denotes a random draw from the continuous uniform distribution [0.75, 1.25], 
 - $\theta$ denotes a random draw from a continuous uniform distribution bounded by the minimum and maximum peak hospitalization rates from the 15 trend filter fits, and 
@@ -59,59 +77,63 @@ The generating function for the hospitalization rate in week $i$ of simulated se
 
 ```{r, results = "asis", echo = FALSE}
 
-cat("$$f^{sim} (i) = \\frac{\\theta}{\\text{max}_j f(j)} \\left[ f \\left( \\frac{i - \\mu}{v} + \\substack{\\text{arg max }{j} \\\\ f(j) } \\right) \\right] + \\epsilon_i, \\epsilon_i \\sim N(0, (\\hat{\\tau}^{s'})^2),$$")
+cat("$$\\bm{f}^{sim} (i) = \\frac{\\theta}{\\text{max}_j \\bm{f}(j)} \\left[ \\bm{f} \\left( \\frac{i - \\mu}{v} + \\substack{\\text{arg max }{j} \\\\ \\bm{f}(j) } \\right) \\right] + \\epsilon_i, \\epsilon_i \\sim N(0, (\\hat{\\tau}^{s'})^2),$$")
 
 ```
 
-where $f(j)$ now denotes the vector of fitted hospitalization rates from the linear trend filter fit (randomly selected shape $f$) and $j$ the integer week for which we want to retrieve the prediction from this fit (where the prediction will be assigned to week $i$ in the final curve). $max_j f(j)$ denotes the peak hospitalization rate from the selected shape, whereas `r  "$\\substack{\\text{arg max }{j} \\\\ f(j) }$"` denotes the week in which this peak occurred. The parameters $\theta$, $\mu$, and $\nu$ follow from their prior description. Finally, we introduce noise for each simulated weekly hospitalization rate based on the selected estimate of $\tau^2$.
+where $\bm{f}(j)$ now denotes the vector of fitted hospitalization rates from the linear trend filter fit (randomly selected shape $\bm{f}$) and $j$ the integer week for which we want to retrieve the prediction from this fit (where the prediction will be assigned to week $i$ in the final curve). $max_j \bm{f}(j)$ denotes the peak hospitalization rate from the selected shape, whereas `r  "$\\substack{\\text{arg max }{j} \\\\ \\bm{f}(j) }$"` denotes the week in which this peak occurred. The parameters $\theta$, $\mu$, and $\nu$ follow from their prior description. Finally, we introduce noise for each simulated weekly hospitalization rate based on the selected estimate of $\tau^2$.
 
 The formula above conceals a minor alteration we made in order to retrieve predictions for week *j*. The `genlasso` package requires an identity predictor matrix for fitting the trend filter and selecting its $\lambda$ penalty [@Arnold-2019-gl]. In order to generate predictions for week *j* from the trend filter models, where *j* is a perturbed version of *i*, we translated *j* to indicate the proportion by which to increase or decrease the predicted hospitalization rate for a given week. For instance, say $j = 5.5$ and will be mapped to week $i = 6$ in the simulated curve. The predictor matrix fed to the model in order to get the prediction for *j* would have the value 0.917 in row 6, column 6.
 
 
-# Component models
 
-## Linear regression
+# Web Appendix 3
+## Component models
+### Linear regression
 
 For each week of the flu season, we specified a linear regression model that included covariates chosen by a correlation-based screening algorithm [@Friedman2019-uw; @Polley2019-sl] in which covariates with _p_ < 0.10 were entered into the linear regression. The linear model was specified using the `glm()` function in R with a Gaussian error distribution and identity link.
 
-## Penalized regression
+### Penalized regression
 
 We implemented several loss-based regression learners using the `glmnet` package in R [@Friedman2019-uw]. These learners included a learner with the lasso penalty [@Tibshirani1996-vt], a learner with the ridge penalty [@Tibshirani1996-vt], and three versions of the elastic net model [@Friedman2019-uw] using different $\alpha$ penalties. The elastic net model essentially combines elements of the lasso and ridge penalties within the same model [@Friedman2019-uw]. All models selected their respective $\lambda$ penalties via 10-fold cross-validation (according to package defaults) and used a Gaussian error distribution [@Friedman2019-uw]. We also activated the option to standardize covariates for the lasso and ridge models [@Friedman2019-uw]. The elastic net model essentially combines elements of the lasso and ridge penalties within the same model [@Friedman2019-uw].
 
-## Random forests
+### Random forests
 
 We implemented random forest algorithms [@Breiman2001-vm] using the `randomForest` package [@Liaw2018-fe]. We modified tuning parameters governing the number of regression trees grown (i.e., the size of the forest), the  minimum number of observations allowed in terminal nodes, and the number of covariates selected for splitting in each tree.
 
-## Support vector regression
+### Support vector regression
 
 We implemented several support vector regressions [@Hastie2009-ft] using the `e1071` package [@Meyer2019-gr]---one using a radial kernel and three others using a polynomial kernel of differing degrees.
 
-## Neural networks
+### Neural networks
 
 We implemented several neural networks [@Hastie2009-ft] using the `nnet` package [@Ripley2020-ds]. All learners proposed contained a single hidden layer, altering tuning parameters governing the number of nodes in this hidden layer and the magnitude of decay applied to node weights.
 
-## LOESS
+### LOESS
 
 We submitted several LOESS-based learners as implemented in base R, varying the smoothing kernel span.
 
-## Polynomial multivariate adaptive regression splines
+### Polynomial multivariate adaptive regression splines
 
 We submitted several polyMARS models using the `polspline` package [@Kooperberg2019-ma], varying the generalized cross-validation value, larger values of which produce smaller models [@Kooperberg2019-ma].
 
 
-# Technical details
+## Technical details
 
 The super learner algorithm was implemented on a high-performance computing cluster housed at the Center for Computation and Visualization at Brown University. Each run was submitted to a large-memory node and parallelized across 32 central processing units using functionality provided in `sl3` [@Coyle2020-ze] via the `delayed` [@Coyle2020-rq] and `future` [@Bengtsson2020-oz] packages in R 3.6.3. In general, running the super learner algorithm required between (roughly) 30--60 minutes per week across all prediction targets, with approximately 22--24 hours required to conduct a complete set of computing jobs for a single prediction target. Super learners trained on observed data were parallelized across 16 processors.
 
 Data visualization and summarization were conducted in R 4.0.5, while curve simulations were conducted in R versions greater than or equal to 3.6.3.
 
-# Ethics statement
+## Ethics statement
 
 This manuscript involves only the use of publicly available influenza surveillance data aggregated at the national level. Therefore, the study is not considered Human Subjects Research and no Institutional Review Board approval was required.
 
-# Results
 
-## Alternate trend filter penalty
+\newpage
+# Web Appendix 4
+## Results
+
+### Alternate trend filter penalty
 
 ```{r sen-l1se-setup}
 pkrate_risks_1se <- fread(get_asset("TAB", "Risks-EDSL-Mean_PeakRate-L1SE"))
@@ -129,7 +151,7 @@ chdsl_num_1se <- get_risks(cumhosp_risks_1se, "DiscreteSL")
 
 For the peak rate prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(presl_num_1se)` and `r max(presl_num_1se)` per 100,000 population and the discrete super learner's between `r min(prdsl_num_1se)` and `r max(presl_num_1se)` per 100,000 population. For the peak week prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(pwesl_num_1se)` and `r max(pwesl_num_1se)` weeks and the discrete super learner's between `r min(pwdsl_num_1se)` and `r max(pwdsl_num_1se)` weeks. For the cumulative rate prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(chesl_num_1se, na.rm = TRUE)` and `r max(chesl_num_1se, na.rm = TRUE)` per 100,000 population and the discrete super learner's ranged between `r min(chdsl_num_1se, na.rm = TRUE)` and `r max(chdsl_num_1se, na.rm = TRUE)` per 100,000 population.
 
-## Component learner subset
+### Component learner subset
 
 ```{r sen-erf-setup}
 pkrate_risks_erf <- fread(get_asset("TAB", "Risks-EDSL-Mean_PeakRate-ERF"))
@@ -147,7 +169,7 @@ chdsl_num_erf <- get_risks(cumhosp_risks_erf, "DiscreteSL")
 
 For the peak rate prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(presl_num_erf)` and `r max(presl_num_erf)` per 100,000 population and the discrete super learner's between `r min(prdsl_num_erf)` and `r max(prdsl_num_erf)` per 100,000 population. For the peak week prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(pwesl_num_erf)` and `r max(pwesl_num_erf)` weeks and the discrete super learner's between `r min(pwdsl_num_erf)` and `r max(pwdsl_num_erf)` weeks. For the cumulative rate prediction target, the ensemble super learner's predictions exhibited mean prediction risks ranging between `r min(chesl_num_erf)` and `r max(chesl_num_erf)` per 100,000 population and the discrete super learner's between `r min(chdsl_num_erf)` and `r max(chdsl_num_erf)` per 100,000 population.
 
-## Squared error loss
+### Squared error loss
 
 ```{r sen-sqe-setup}
 
@@ -168,16 +190,14 @@ For the peak rate prediction target, the ensemble super learner's predictions ex
 
 
 \newpage 
-# Supplemental Tables and Figures
 
-<!-- SUPPLEMENTAL FIGURE -->
+# References
 
-```{r supp-tf-pred-lmin, results = "asis", fig.asp = 1800/2250}
-slug <- "TF-Predictions_lambda.min"
-supp_cap(slug)
-include_graphics(get_asset("FIG", slug))
-```
+\bibliography{references}
+<div id="refs"></div>
 \newpage
+
+# Web Tables 
 
 <!-- SUPPLEMENTAL TABLE -->
 
@@ -193,15 +213,6 @@ tmpcts %>%
   theme_booktabs() %>%
   font(., fontname = global_table_font, part = "all") %>%
   autofit
-```
-\newpage
-
-<!-- SUPPLEMENTAL FIGURE -->
-
-```{r supp-simtemplate-rand, results = "asis", fig.asp = 1800/2250}
-slug <- "Simulation-Curves-by-Template-Rand10"
-supp_cap(slug)
-include_graphics(get_asset("FIG", slug))
 ```
 \newpage
 
@@ -221,7 +232,7 @@ rwsum_pr <- fread(get_asset("TAB", slug))
 supp_cap(slug)
 
 rwsum_pr[, (rdcols) := lapply(.SD, roundit), .SDcols = rdcols][] %>%
-  flextable(cwidth = c(0.6, rep(1.15, 5))) %>%
+  flextable(cwidth = c(0.51, rep((6 - 0.51) / 5, 5))) %>%
   bold(., part = "header") %>%
   padding(padding = 0, part = "all") %>%
   font(., fontname = global_table_font, part = "all")
@@ -239,7 +250,7 @@ rwsum_pw <- fread(get_asset("TAB", slug))
 supp_cap(slug)
 
 rwsum_pw[, (rdcols) := lapply(.SD, roundit), .SDcols = rdcols][] %>%
-  flextable(cwidth = c(0.6, rep(1.15, 5))) %>%
+  flextable(cwidth = c(0.51, rep((6 - 0.51) / 5, 5))) %>%
   bold(., part = "header") %>%
   padding(padding = 0, part = "all") %>%
   font(., fontname = global_table_font, part = "all")
@@ -256,10 +267,296 @@ rwsum_ch <- fread(get_asset("TAB", slug))
 supp_cap(slug)
 
 rwsum_ch[, (rdcols) := lapply(.SD, roundit), .SDcols = rdcols][] %>%
-  flextable(cwidth = c(0.6, rep(1.15, 5))) %>%
+  flextable(cwidth = c(0.51, rep((6 - 0.51) / 5, 5))) %>%
   bold(., part = "header") %>%
   padding(padding = 0, part = "all") %>%
   font(., fontname = global_table_font, part = "all")
+```
+\newpage
+
+<!-- SUPPLEMENTAL TABLE -->
+
+
+<!-- h/t for minipage layouts https://latex-tutorial.com/minipage-latex/ -->
+
+```{r supp-peakrate-risks-lse-cap, results = "asis"}
+slug <- "Risks-EDSL-Mean_PeakRate-L1SE"
+pkrate_risks <- fread(get_asset("TAB", slug))
+
+supp_cap(slug)
+```
+
+\begin{minipage}{0.5\textwidth}
+
+```{r supp-peakrate-risks-lse-tab, results = "asis"}
+pkrate_risks %>%
+  flextable(
+    cwidth = c(0.51, rep(1.2, 2))
+  ) %>%
+  risktab_cnames_word() %>%
+  bold(., part = "header") %>%
+  align(part = "all", align = "center") %>%
+  #add_footer_lines(risktabfn("Peak rate")) %>%
+  font(., fontname = global_table_font, part = "all")
+```
+\end{minipage}
+\hspace{0.05\textwidth}
+\begin{minipage}{0.4\textwidth}
+```{r supp-peakrate-risks-lse-fn, results = "asis"}
+cat(risktabfn("Peak rate"))
+```
+\end{minipage}
+
+\newpage
+
+<!-- SUPPLEMENTAL TABLE -->
+
+
+```{r supp-peakweek-risks-lse-cap, results = "asis"}
+supp_cap(slug)
+```
+\begin{minipage}{0.5\textwidth}
+
+```{r supp-peakweek-risks-lse-tab, results = "asis"}
+slug <- "Risks-EDSL-Mean_PeakWeek-L1SE"
+pkweek_risks <- fread(get_asset("TAB", slug))
+
+
+pkweek_risks %>%
+  flextable(
+    cwidth = c(0.51, rep(1.2, 2))
+  ) %>%
+  risktab_cnames_word() %>%
+  bold(., part = "header") %>%
+  align(part = "all", align = "center") %>%
+  #add_footer_lines(risktabfn("Peak week")) %>%
+  font(., fontname = global_table_font, part = "all")
+```
+\end{minipage}
+\hspace{0.05\textwidth}
+\begin{minipage}{0.4\textwidth}
+```{r supp-peakweek-risks-lse-fn, results = "asis"}
+cat(risktabfn("Peak week"))
+```
+\end{minipage}
+
+\newpage
+
+
+<!-- SUPPLEMENTAL TABLE -->
+
+```{r supp-cumhosp-risks-lse-cap, results = "asis"}
+slug <- "Risks-EDSL-Mean_CumHosp-L1SE"
+cumhosp_risks <- fread(get_asset("TAB", slug))
+
+supp_cap(slug)
+```
+
+\begin{minipage}{0.5\textwidth}
+```{r supp-cumhosp-risks-lse-tab, results = "asis"}
+cumhosp_risks %>%
+  flextable(
+    cwidth = c(0.51, rep(1.2, 2))
+  ) %>%
+  risktab_cnames_word() %>%
+  bold(., part = "header") %>%
+  align(part = "all", align = "center") %>%
+  #add_footer_lines(risktabfn("Cumulative hospitalizations")) %>%
+  font(., fontname = global_table_font, part = "all")
+```
+\end{minipage}
+\hspace{0.05\textwidth}
+\begin{minipage}{0.4\textwidth}
+```{r supp-cumhosp-risks-lse-fn, results = "asis"}
+cat(risktabfn("Cumulative hospitalizations"))
+```
+\end{minipage}
+
+\newpage
+
+<!-- SUPPLEMENTAL TABLE -->
+
+```{r supp-peakrate-risks-erf-cap, results = "asis"}
+slug <- "Risks-EDSL-Mean_PeakRate-ERF"
+pkrate_risks <- fread(get_asset("TAB", slug))
+
+supp_cap(slug)
+```
+
+\begin{minipage}{0.5\textwidth}
+```{r supp-peakrate-risks-erf-tab, results = "asis"}
+pkrate_risks %>%
+  flextable(
+    cwidth = c(0.51, rep(1.2, 2))
+  ) %>%
+  risktab_cnames_word() %>%
+  bold(., part = "header") %>%
+  align(part = "all", align = "center") %>%
+  #add_footer_lines(risktabfn("Peak rate")) %>%
+  font(., fontname = global_table_font, part = "all")
+```
+\end{minipage}
+\hspace{0.05\textwidth}
+\begin{minipage}{0.4\textwidth}
+```{r supp-peakrate-risks-erf-fn, results = "asis"}
+cat(risktabfn("Peak rate"))
+```
+\end{minipage}
+
+\newpage
+
+<!-- SUPPLEMENTAL TABLE -->
+
+```{r supp-peakweek-risks-erf-cap, results = "asis"}
+slug <- "Risks-EDSL-Mean_PeakWeek-ERF"
+pkweek_risks <- fread(get_asset("TAB", slug))
+
+supp_cap(slug)
+```
+
+\begin{minipage}{0.5\textwidth}
+
+```{r supp-peakweek-risks-erf-tab, results = "asis"}
+pkweek_risks %>%
+  flextable(
+    cwidth = c(0.51, rep(1.2, 2))
+  ) %>%
+  risktab_cnames_word() %>%
+  bold(., part = "header") %>%
+  align(part = "all", align = "center") %>%
+  #add_footer_lines(risktabfn("Peak week")) %>%
+  font(., fontname = global_table_font, part = "all")
+```
+\end{minipage}
+\hspace{0.05\textwidth}
+\begin{minipage}{0.4\textwidth}
+```{r supp-peakweek-risks-erf-fn, results = "asis"}
+cat(risktabfn("Peak week"))
+```
+\end{minipage}
+
+\newpage
+
+<!-- SUPPLEMENTAL TABLE -->
+
+```{r supp-cumhosp-risks-erf-cap, results = "asis"}
+slug <- "Risks-EDSL-Mean_CumHosp-ERF"
+cumhosp_risks <- fread(get_asset("TAB", slug))
+
+supp_cap(slug)
+```
+
+\begin{minipage}{0.5\textwidth}
+```{r supp-cumhosp-risks-erf-tab, results = "asis"}
+cumhosp_risks %>%
+  flextable(
+    cwidth = c(0.51, rep(1.2, 2))
+  ) %>%
+  risktab_cnames_word() %>%
+  bold(., part = "header") %>%
+  align(part = "all", align = "center") %>%
+  #add_footer_lines(risktabfn("Cumulative rate")) %>%
+  font(., fontname = global_table_font, part = "all")
+```
+\end{minipage}
+\hspace{0.05\textwidth}
+\begin{minipage}{0.4\textwidth}
+```{r supp-cumhosp-risks-erf-fn, results = "asis"}
+cat(risktabfn("Cumulative hospitalizations"))
+```
+\end{minipage}
+\newpage
+
+<!-- SUPPLEMENTAL TABLE -->
+
+```{r supp-peakrate-risks-sqe, results = "asis"}
+slug <- "Risks-EDSL-Mean_PeakRate-SQE"
+pkrate_risks <- fread(get_asset("TAB", slug))
+
+supp_cap(slug)
+
+pkrate_risks %>%
+  flextable(
+    cwidth = c(0.51, rep(1.2, 2))
+  ) %>%
+  risktab_cnames_word() %>%
+  bold(., part = "header") %>%
+  align(part = "all", align = "center") %>%
+  add_footer_lines(risktabfn("Peak rate", sqe = TRUE)) %>%
+  font(., fontname = global_table_font, part = "all")
+```
+\newpage
+
+<!-- SUPPLEMENTAL TABLE -->
+
+```{r supp-peakweek-risks-sqe, results = "asis"}
+slug <- "Risks-EDSL-Mean_PeakWeek-SQE"
+pkweek_risks <- fread(get_asset("TAB", slug))
+
+supp_cap(slug)
+
+pkweek_risks %>%
+  flextable(
+    cwidth = c(0.51, rep(1.2, 2))
+  ) %>%
+  risktab_cnames_word() %>%
+  bold(., part = "header") %>%
+  align(part = "all", align = "center") %>%
+  add_footer_lines(risktabfn("Peak week", sqe = TRUE)) %>%
+  font(., fontname = global_table_font, part = "all")
+```
+\newpage
+
+<!-- SUPPLEMENTAL TABLE -->
+
+```{r supp-cumhosp-risks-sqe, results = "asis"}
+slug <- "Risks-EDSL-Mean_CumHosp-SQE"
+cumhosp_risks <- fread(get_asset("TAB", slug))
+
+supp_cap(slug)
+
+cumhosp_risks %>%
+  flextable(
+    cwidth = c(0.51, rep(1.2, 2))
+  ) %>%
+  risktab_cnames_word() %>%
+  bold(., part = "header") %>%
+  align(part = "all", align = "center") %>%
+  add_footer_lines(risktabfn("Cumulative rate", sqe = TRUE)) %>%
+  font(., fontname = global_table_font, part = "all")
+```
+\newpage
+
+
+# Web Figures
+
+<!-- SUPPLEMENTAL FIGURE -->
+
+```{r supp-tf-pred-lmin, results = "asis", fig.asp = 1800/2250}
+slug <- "TF-Predictions_lambda.min"
+supp_cap(slug)
+# set pdfout to FALSE because of hyphen rendering issue 
+include_graphics(get_asset("FIG", slug, date = simdat_date, pdfout = F))
+```
+\newpage
+
+
+<!-- SUPPLEMENTAL FIGURE -->
+
+```{r supp-simtemplate-rand, results = "asis", fig.asp = 1800/2250}
+slug <- "Simulation-Curves-by-Template-Rand10"
+supp_cap(slug)
+include_graphics(get_asset("FIG", slug))
+```
+\newpage
+
+<!-- SUPPLEMENTAL FIGURE -->
+
+```{r supp-tfpred-lse, results = "asis", fig.asp = 1800/2250}
+slug <- "TF-Predictions_lambda.1se"
+supp_cap(slug)
+# set pdfout to FALSE because of hyphen rendering issue
+include_graphics(get_asset("FIG", slug, date = simdat_date, pdfout = F))
 ```
 \newpage
 
@@ -270,6 +567,7 @@ slug <- "Risktiles_Peak-Rate"
 supp_cap(slug)
 knitr::include_graphics(get_asset("FIG", slug))
 ```
+
 \newpage
 
 <!-- SUPPLEMENTAL FIGURE -->
@@ -287,72 +585,6 @@ knitr::include_graphics(get_asset("FIG", slug))
 slug <- "Risktiles_Cum-Hosp"
 supp_cap(slug)
 knitr::include_graphics(get_asset("FIG", slug))
-```
-\newpage
-
-<!-- SUPPLEMENTAL FIGURE -->
-
-```{r supp-tfpred-lse, results = "asis", fig.asp = 1800/2250}
-slug <- "TF-Predictions_lambda.1se"
-supp_cap(slug)
-include_graphics(get_asset("FIG", slug))
-```
-\newpage
-
-<!-- SUPPLEMENTAL TABLE -->
-
-```{r supp-peakrate-risks-lse, results = "asis"}
-slug <- "Risks-EDSL-Mean_PeakRate-L1SE"
-pkrate_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
-
-pkrate_risks %>%
-  flextable(
-    cwidth = c(0.6, rep(1.1, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  add_footer_lines(risktabfn("Peak rate")) %>%
-  font(., fontname = global_table_font, part = "all")
-```
-\newpage
-
-<!-- SUPPLEMENTAL TABLE -->
-
-```{r supp-peakweek-risks-lse, results = "asis"}
-slug <- "Risks-EDSL-Mean_PeakWeek-L1SE"
-pkweek_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
-
-pkweek_risks %>%
-  flextable(
-    cwidth = c(0.6, rep(1.1, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  add_footer_lines(risktabfn("Peak week")) %>%
-  font(., fontname = global_table_font, part = "all")
-```
-\newpage
-
-<!-- SUPPLEMENTAL TABLE -->
-
-```{r supp-cumhosp-risks-lse, results = "asis"}
-slug <- "Risks-EDSL-Mean_CumHosp-L1SE"
-cumhosp_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
-
-cumhosp_risks %>%
-  flextable(
-    cwidth = c(0.6, rep(1.1, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  add_footer_lines(risktabfn("Cumulative hospitalizations")) %>%
-  font(., fontname = global_table_font, part = "all")
 ```
 \newpage
 
@@ -383,62 +615,6 @@ knitr::include_graphics(get_asset("FIG", slug))
 ```
 \newpage
 
-<!-- SUPPLEMENTAL TABLE -->
-
-```{r supp-peakrate-risks-erf, results = "asis"}
-slug <- "Risks-EDSL-Mean_PeakRate-ERF"
-pkrate_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
-
-pkrate_risks %>%
-  flextable(
-    cwidth = c(0.6, rep(1.1, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  add_footer_lines(risktabfn("Peak rate")) %>%
-  font(., fontname = global_table_font, part = "all")
-```
-\newpage
-
-<!-- SUPPLEMENTAL TABLE -->
-
-```{r supp-peakweek-risks-erf, results = "asis"}
-slug <- "Risks-EDSL-Mean_PeakWeek-ERF"
-pkweek_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
-
-pkweek_risks %>%
-  flextable(
-    cwidth = c(0.6, rep(1.1, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  add_footer_lines(risktabfn("Peak week")) %>%
-  font(., fontname = global_table_font, part = "all")
-```
-\newpage
-
-<!-- SUPPLEMENTAL TABLE -->
-
-```{r supp-cumhosp-risks-erf, results = "asis"}
-slug <- "Risks-EDSL-Mean_CumHosp-ERF"
-cumhosp_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
-
-cumhosp_risks %>%
-  flextable(
-    cwidth = c(0.6, rep(1.1, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  add_footer_lines(risktabfn("Cumulative rate")) %>%
-  font(., fontname = global_table_font, part = "all")
-```
-\newpage
 
 <!-- SUPPLEMENTAL FIGURE -->
 
@@ -464,64 +640,6 @@ knitr::include_graphics(get_asset("FIG", slug))
 slug <- "Risktiles_Cum-Hosp-ERF"
 supp_cap(slug)
 knitr::include_graphics(get_asset("FIG", slug))
-```
-\newpage
-
-
-<!-- SUPPLEMENTAL TABLE -->
-
-```{r supp-peakrate-risks-sqe, results = "asis"}
-slug <- "Risks-EDSL-Mean_PeakRate-SQE"
-pkrate_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
-
-pkrate_risks %>%
-  flextable(
-    cwidth = c(0.6, rep(1.1, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  add_footer_lines(risktabfn("Peak rate", sqe = TRUE)) %>%
-  font(., fontname = global_table_font, part = "all")
-```
-\newpage
-
-<!-- SUPPLEMENTAL TABLE -->
-
-```{r supp-peakweek-risks-sqe, results = "asis"}
-slug <- "Risks-EDSL-Mean_PeakWeek-SQE"
-pkweek_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
-
-pkweek_risks %>%
-  flextable(
-    cwidth = c(0.6, rep(1.1, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  add_footer_lines(risktabfn("Peak week", sqe = TRUE)) %>%
-  font(., fontname = global_table_font, part = "all")
-```
-\newpage
-
-<!-- SUPPLEMENTAL TABLE -->
-
-```{r supp-cumhosp-risks-sqe, results = "asis"}
-slug <- "Risks-EDSL-Mean_CumHosp-SQE"
-cumhosp_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
-
-cumhosp_risks %>%
-  flextable(
-    cwidth = c(0.6, rep(1.1, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  add_footer_lines(risktabfn("Cumulative rate", sqe = TRUE)) %>%
-  font(., fontname = global_table_font, part = "all")
 ```
 \newpage
 
@@ -579,8 +697,3 @@ slug <- "Observed-Predict-Simulated"
 supp_cap(slug)
 knitr::include_graphics(get_asset("FIG", slug))
 ```
-
-\newpage
-# References
-
-\bibliography{references}

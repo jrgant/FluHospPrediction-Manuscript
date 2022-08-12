@@ -50,7 +50,7 @@
   <macro name="accessed-date">
     <choose>
       <if variable="URL">
-        <group prefix="(" suffix=")" delimiter=" ">
+        <group prefix=" (" suffix=")" delimiter=" ">
           <text term="accessed" text-case="capitalize-first"/>
           <date variable="accessed" prefix=" ">
             <date-part name="month"/>

@@ -19,28 +19,14 @@ always_allow_html: true
     
 # Abstract
 
-## Background
-
-Accurate forecasts can inform response to outbreaks. Most efforts in influenza forecasting have focused on predicting influenza-like activity, but fewer on influenza-related hospitalizations. We conducted a simulation study to evaluate a super learner's predictions of three seasonal measures of influenza hospitalizations in the United States: peak hospitalization rate, peak hospitalization week, and cumulative hospitalization rate. 
-
-## Methods 
-
-We trained an ensemble machine learning algorithm on 15,000 simulated hospitalization curves and generated weekly predictions. We compared the performance of the ensemble (weighted combination of predictions from multiple prediction algorithms), the best-performing individual prediction algorithm, and a naive prediction (median of a simulated outcome distribution). 
-
-## Results
-
-Ensemble predictions performed similarly to the naive predictions early in the season but consistently improved as the season progressed for all prediction targets. The best-performing prediction algorithm in each week typically had similar predictive accuracy compared to the ensemble, but the specific prediction algorithm selected varied by week. 
-
-## Conclusions
-
-An ensemble super learner improved predictions of influenza-related hospitalizations, relative to a naive prediction. Future work should examine the super learner's performance using additional empirical data on influenza-related predictors (e.g., influenza-like illness). The algorithm should also be tailored to produce prospective probabilistic forecasts of selected prediction targets.
+Accurate forecasts can inform response to outbreaks. Most efforts in influenza forecasting have focused on predicting influenza-like activity, but fewer on influenza-related hospitalizations. We conducted a simulation study to evaluate a super learner's predictions of three seasonal measures of influenza hospitalizations in the United States: peak hospitalization rate, peak hospitalization week, and cumulative hospitalization rate. We trained an ensemble machine learning algorithm on 15,000 simulated hospitalization curves and generated weekly predictions. We compared the performance of the ensemble (weighted combination of predictions from multiple prediction algorithms), the best-performing individual prediction algorithm, and a naive prediction (median of a simulated outcome distribution). Ensemble predictions performed similarly to the naive predictions early in the season but consistently improved as the season progressed for all prediction targets. The best-performing prediction algorithm in each week typically had similar predictive accuracy compared to the ensemble, but the specific prediction algorithm selected varied by week. An ensemble super learner improved predictions of influenza-related hospitalizations, relative to a naive prediction. Future work should examine the super learner's performance using additional empirical data on influenza-related predictors (e.g., influenza-like illness). The algorithm should also be tailored to produce prospective probabilistic forecasts of selected prediction targets.
 
 (199/200 words)
 
 
 # Introduction
 
-```{r include=FALSE}
+```{r setup, include=FALSE}
 source("manuscript-setup.R")
 ```
 
@@ -58,7 +44,7 @@ We conducted a simulation study to examine the super learner's potential as a to
     
 ## Empirical data
 
-We downloaded publicly available surveillance data on seasonal influenza-related hospitalizations from the CDC's FluView Interactive dashboard [@Centers_for_Disease_Control_and_Prevention_undated-vt], using Emerging Infections Program (EIP) data beginning with the 2003--2004 season and ending with 2018--2019. We omitted the 2009--2010 pandemic influenza year due to dynamics that differ between pandemic and seasonal influenza and modified curves so that each flu season spanned 30 weeks (see *Supplemental Appendix*). 
+We downloaded publicly available surveillance data on seasonal influenza-related hospitalizations from the CDC's FluView Interactive dashboard [@Centers_for_Disease_Control_and_Prevention_undated-vt], using Emerging Infections Program (EIP) data beginning with the 2003--2004 season and ending with 2018--2019. We omitted the 2009--2010 pandemic influenza year due to dynamics that differ between pandemic and seasonal influenza and modified curves so that each flu season spanned 30 weeks (see **Web Appendix 1**). 
 
 Hospitalization rates reported in FluSurv-NET, of which EIP represents a subset of surveillance sites, are calculated based on influenza-related hospitalizations among residents within a given catchment area. Cases are defined as hospitalizations accompanied by laboratory-confirmed influenza during the hospitalization or in the 14 days preceding it [@2021-influenza]. Rate denominators are the total population in the specified catchment area [@2021-influenza].
 
@@ -70,13 +56,13 @@ Following from the CDC's Flu Sight challenge [@Centers_for_Disease_Control_and_P
 2. _Peak hospitalization week_, week during which this peak rate occurred, and
 3. _Cumulative hospitalization rate_, cumulative influenza-related hospitalization rate over the flu season. 
 
-Fifteen empirical observations were available for each prediction target (**Table \@ref(tab:targtable)**).
+Fifteen empirical observations were available for each prediction target (Table \@ref(tab:targtable)).
 
 ## Simulating hospitalization curves
 
-To simulate seasonal influenza hospitalization curves, we adapted an approach developed by Brooks et al. to predict ILI [@Brooks2015-fl]. First, using the `genlasso` package in R [@Arnold-2019-gl; @RCore2020-ct], we fitted a linear trend filter [@Kim2009-bz; @Tibshirani2014-tr] to each of the 15 observed influenza hospitalization curves in the EIP. The linear trend filter is a penalized method that fits a piecewise linear function to a time series, testing multiple values of the penalty ($\lambda$) by default [@Arnold-2019-gl]. We used these fits as templates for the simulated influenza hospitalization curves, choosing the $\lambda$ penalty via 5-fold cross-validation [@Brooks2015-fl]. In the main analysis we used the $\lambda$ value that minimized the trend filter's prediction error across the folds [@Brooks2015-fl], hereafter referred to as $\lambda_{min}$.
+To simulate seasonal influenza hospitalization curves, we adapted an approach developed by Brooks et al. to predict ILI [@Brooks2015-fl]. First, using the `genlasso` package in R [@Arnold-2019-gl; @RCore2020-ct], we fitted a linear trend filter [@Kim2009-bz; @Tibshirani2014-tr] to each of the 15 observed influenza hospitalization curves in the EIP. The linear trend filter is a penalized method that fits a piecewise linear function to a time series, testing multiple values of the penalty ($\lambda$) by default [@Arnold-2019-gl]. We used these fits as templates for the simulated influenza hospitalization curves (**Web Table 1**), choosing the $\lambda$ penalty via 5-fold cross-validation [@Brooks2015-fl]. In the main analysis we used the $\lambda$ value that minimized the trend filter's prediction error across the folds [@Brooks2015-fl], hereafter referred to as $\lambda_{min}$ **Web Figure 1**.
 
-Next, we used the resulting 15 trend filter fits in a slightly modified version of the curve generation scheme described by Brooks et al. (see *Supplemental Appendix*), who conceptualize a seasonal influenza curve generically as a function of the week of the season, plus a noise term with mean 0 and variance $\tau^2$ [@Brooks2015-fl]. For each empirical season, we averaged the squared residuals from its trend filter fit over all weeks to estimate ${(\tau^s)}^2$.
+Next, we used the resulting 15 trend filter fits in a slightly modified version of the curve generation scheme described by Brooks et al. (see **Web Appendix 2**), who conceptualize a seasonal influenza curve generically as a function of the week of the season, plus a noise term with mean 0 and variance $\tau^2$ [@Brooks2015-fl]. For each empirical season, we averaged the squared residuals from its trend filter fit over all weeks to estimate ${(\tau^s)}^2$.
 
 For each simulated curve, we sampled each of the following parameters randomly and independently:
 
@@ -102,7 +88,7 @@ The super learner produces an ensemble prediction that is a weighted linear comb
 
 For each prediction target in the current study we specified the same library of learners and measured the component and ensemble super learners' performance using the absolute error loss, the average absolute difference between model predictions and the true "observed" values in the simulated data set [@Polley2011-oz]. This loss function targets the conditional median of the outcome distribution [@Polley2011-oz]---for example, median peak hospitalization rate---which we selected due to skewness in the simulated peak week and cumulative hospitalization distributions (**Figure \@ref(fig:simcompare)**). 
 
-We implemented the super learner using the `sl3` package in R [@Coyle2020-ze]. Progressing sequentially through the flu season, we ran the super learner at each week *i* to predict the season-level target of interest as a function of current and past hospitalization rates. All component learners included the following predictor variables (see *Supplemental Appendix* for an exception; rates per 100,000 population):
+We implemented the super learner using the `sl3` package in R [@Coyle2020-ze]. Progressing sequentially through the flu season, we ran the super learner at each week *i* to predict the season-level target of interest as a function of current and past hospitalization rates. All component learners included the following predictor variables (see **Web Appendix 3** for an exception; rates per 100,000 population):
 
   * hospitalization rate in week *i*, 
   * cumulative rate through week *i*,
@@ -134,7 +120,7 @@ The procedure outlined above yields cross-validated prediction risks for each co
 
 ## Component models
 
-Theory and finite-sample demonstrations indicate the super learner should benefit from using a variety of component models, even if some models perform poorly [@Van_der_Laan2007-ml]. Therefore, we specified a variety of component learners and tuning parameters (e.g., kernels, complexity penalties) to probe a diverse set of prediction algorithms. We used component learners provided in the `sl3` [@Coyle2020-ze] and `SuperLearner` [@Polley2019-sl] packages in R (*Supplemental Appendix*).
+Theory and finite-sample demonstrations indicate the super learner should benefit from using a variety of component models, even if some models perform poorly [@Van_der_Laan2007-ml]. Therefore, we specified a variety of component learners and tuning parameters (e.g., kernels, complexity penalties) to probe a diverse set of prediction algorithms. We used component learners provided in the `sl3` [@Coyle2020-ze] and `SuperLearner` [@Polley2019-sl] packages in R (**Web Appendix 3**).
  
 For each prediction target, we compared the ensemble super learner's performance against the discrete super learner and a naive prediction (the outcome median). We also used cross-validation to calculate the naive prediction's error: for each validation set we used the outcome median from the training set as the prediction and averaged the fold-specific risks to get the cross-validated risk.
  
@@ -142,7 +128,7 @@ For each prediction target, we compared the ensemble super learner's performance
 
 We conducted three sensitivity analyses to explore the ensemble learner's performance under different analytic choices. 
 
-First, we simulated curves using an alternate penalty in the linear trend filter ($\lambda_{SE}$), selected as the $\lambda$ that produced a cross-validated error estimate within one standard error of the prediction error produced by $\lambda_{min}$ [@Arnold-2019-gl].
+First, we simulated curves using an alternate penalty in the linear trend filter ($\lambda_{SE}$), selected as the $\lambda$ that produced a cross-validated error estimate within one standard error of the prediction error produced by $\lambda_{min}$ [@Arnold-2019-gl] (**Web Figure 3**).
 
 Second, we included only the elastic net and random forest learners, based on their good performance in the main analysis. This post-hoc analysis compared the quality of predictions produced by the ensemble super learner when given a smaller subset of well-performing component learners.
 
@@ -160,31 +146,31 @@ Finally, we conducted a subanalysis in which we fit the ensemble super learner o
 
 ## Peak rate
 
-For the peak rate prediction target, the ensemble super learner produced risk estimates similar to the median prediction early in the season but improved on the median prediction as the season progressed (**Table \@ref(tab:main-analysis-risk-table)**). This improvement is indicated by the ensemble's lower prediction risks, which equate to better predictive accuracy. Throughout the flu season, the ensemble and discrete super learners exhibited similar prediction risks, though component learners selected as discrete super learners varied by week (**Table \@ref(tab:main-analysis-risk-table), Figure \@ref(fig:ensemble-perf-main)**). Ensemble predictions for the peak hospitalization rate exhibited mean prediction risks ranging between `r min(presl_num)` and `r max(presl_num)` per 100,000 across the flu season (**Figure \@ref(fig:ensemble-perf-regscale)**). Discrete super learner risks ranged between `r min(prdsl_num)` and `r max(prdsl_num)` per 100,000. 
+For the peak rate prediction target, the ensemble super learner produced risk estimates similar to the median prediction early in the season but improved on the median prediction as the season progressed (Table \@ref(tab:main-analysis-risk-table)). This improvement is indicated by the ensemble's lower prediction risks, which equate to better predictive accuracy. Throughout the flu season, the ensemble and discrete super learners exhibited similar prediction risks, though component learners selected as discrete super learners varied by week (Table \@ref(tab:main-analysis-risk-table), Figure \@ref(fig:ensemble-perf-main)A). Ensemble predictions for the peak hospitalization rate exhibited mean prediction risks ranging between `r min(presl_num)` and `r max(presl_num)` per 100,000 across the flu season (Figure \@ref(fig:ensemble-perf-regscale)A). Discrete super learner risks ranged between `r min(prdsl_num)` and `r max(prdsl_num)` per 100,000. Additional information regarding component learners appears in Web Table 2 and Web Figure 4.
 
 ## Peak week 
 
-For the peak week prediction target, the ensemble super learner generally produced risk estimates similar to the median prediction early in the season but improved on the median prediction as the season progressed (**Table \@ref(tab:main-analysis-risk-table)**), where improvement again is based on the observation that ensemble prediction risks drop below those of the median prediction. As with peak rate, the ensemble and discrete super learners exhibited similar prediction risks across the season, and the discrete super learner varied by week. Unlike the peak rate analysis, prediction quality appeared to exhibit a threshold effect near the middle of the season, at which point ensembles' prediction risks improved and then remained relatively stable. Ensemble predictions for the peak week exhibited mean prediction risks ranging between `r min(pwesl_num)` and `r max(pwesl_num)` weeks across the flu season (**Figure \@ref(fig:ensemble-perf-regscale)**). Discrete super learner risks ranged between `r min(pwdsl_num)` and `r max(pwdsl_num)` weeks.
+For the peak week prediction target, the ensemble super learner generally produced risk estimates similar to the median prediction early in the season but improved on the median prediction as the season progressed (Table \@ref(tab:main-analysis-risk-table)), where improvement again is based on the observation that ensemble prediction risks drop below those of the median prediction. As with peak rate, the ensemble and discrete super learners exhibited similar prediction risks across the season, and the discrete super learner varied by week. Unlike the peak rate analysis, prediction quality appeared to exhibit a threshold effect near the middle of the season, at which point ensembles' prediction risks improved and then remained relatively stable. Ensemble predictions for the peak week exhibited mean prediction risks ranging between `r min(pwesl_num)` and `r max(pwesl_num)` weeks across the flu season (Figure \@ref(fig:ensemble-perf-regscale)B). Discrete super learner risks ranged between `r min(pwdsl_num)` and `r max(pwdsl_num)` weeks. Additional information regarding component learners appears in Web Table 3 and Web Figure 5.
   
 ## Cumulative rate
 
-For the cumulative rate prediction target, the ensemble super learner produced risk estimates similar to the median prediction early in the season but improved on the median prediction as the season progressed (**Table \@ref(tab:main-analysis-risk-table)**), where improvement again is based on the observation that ensemble prediction risks drop below those of the median prediction. As with peak rate and peak week, the ensemble and discrete super learners exhibited similar prediction risks across the season, and the discrete super learner varied by week (**Table \@ref(tab:main-analysis-risk-table), Figure \@ref(fig:ensemble-perf-main)**). Ensemble predictions for the cumulative rate exhibited mean prediction risks between `r min(chesl_num, na.rm = TRUE)` and `r max(chesl_num, na.rm = TRUE)` per 100,000 population, and these risks appeared to be higher earlier in the season (**Figure \@ref(fig:ensemble-perf-regscale)**). Discrete super learner risks ranged between `r min(chdsl_num, na.rm = TRUE)` and `r max(chdsl_num, na.rm = TRUE)` per 100,000 population.
+For the cumulative rate prediction target, the ensemble super learner produced risk estimates similar to the median prediction early in the season but improved on the median prediction as the season progressed (Table \@ref(tab:main-analysis-risk-table)), where improvement again is based on the observation that ensemble prediction risks drop below those of the median prediction. As with peak rate and peak week, the ensemble and discrete super learners exhibited similar prediction risks across the season, and the discrete super learner varied by week (Table \@ref(tab:main-analysis-risk-table), Figure \@ref(fig:ensemble-perf-main)C). Ensemble predictions for the cumulative rate exhibited mean prediction risks between `r min(chesl_num, na.rm = TRUE)` and `r max(chesl_num, na.rm = TRUE)` per 100,000 population, and these risks appeared to be higher earlier in the season (Figure \@ref(fig:ensemble-perf-regscale)C). Discrete super learner risks ranged between `r min(chdsl_num, na.rm = TRUE)` and `r max(chdsl_num, na.rm = TRUE)` per 100,000 population. Additional information regarding component learners appears in Web Table 4 and Web Figure 6.
 
 
 ## Sensitivity analyses 
 
-_Alternate trend filter penalty._ The ensemble super learner trained on simulated curves using an alternate trend filter penalty generally produced qualitatively similar results across all prediction targets (**Figure \@ref(fig:ensemble-perf-regscale)**). However, ensemble risks early in the season appear to vary more than in the main analysis.
+_Alternate trend filter penalty._ The ensemble super learner trained on simulated curves using an alternate trend filter penalty generally produced qualitatively similar results across all prediction targets (Figure \@ref(fig:ensemble-perf-regscale)). However, ensemble risks early in the season appear to vary more than in the main analysis. Additional results appear in Web Appendix 4, Web Tables 5--7, and Web Figures 7--9.
 
-_Component learner subset._ The ensemble learner trained using only the elastic net and random forest learners also produced qualitatively similar results across all prediction targets (**Figure \@ref(fig:ensemble-perf-regscale)**). Variance in ensemble risks for peak week appeared to vary more than in the main analysis, suggesting the super learner did benefit slightly from the inclusion of a larger set of models. However, in absolute terms the differences were small.
+_Component learner subset._ The ensemble learner trained using only the elastic net and random forest learners also produced qualitatively similar results across all prediction targets (Figure \@ref(fig:ensemble-perf-regscale)). Variance in ensemble risks for peak week appeared to vary more than in the main analysis, suggesting the super learner did benefit slightly from the inclusion of a larger set of models. However, in absolute terms the differences were small. Additional results appear in Web Appendix 4, Web Tables 8--10, and Web Figures 10--12.
 
-_Squared error loss._ The ensemble learner trained to optimize predictions for the squared error loss (rather than the absolute error loss) consistently exhibited mean prediction risks lower than those of the naive mean prediction across the flu season and for all prediction targets (**Supplemental Item 26**). Qualitatively, ensemble prediction risks were closer to the naive mean early in the season and improved as the season progressed, as in the main and sensitivity analyses.
+_Squared error loss._ The ensemble learner trained to optimize predictions for the squared error loss (rather than the absolute error loss) consistently exhibited mean prediction risks lower than those of the naive mean prediction across the flu season and for all prediction targets (Web Figure 13). Qualitatively, ensemble prediction risks were closer to the naive mean early in the season and improved as the season progressed, as in the main and sensitivity analyses. Additional results appear in Web Appendix 4, Web Tables 11--13, and Web Figures 14--16.
 
   
 ## Subanalysis
 
-Across all prediction targets, the ensemble super learners trained on simulated and observed data both tended to improve on the naive median prediction using observed data from prior seasons (**Figure** \@ref(fig:prosp-application), **Supplemental Item, Figure 30**). These improvements were more apparent in the 2017--18 influenza season which was more severe than 2016--17 and 2018--19 with respect to peak rate and cumulative hospitalizations. In addition, ensembles tended to produce predictions of similar quality across the flu season, while the ensemble trained only on observed data generated several predictions of much poorer quality than both the ensemble trained in simulated data and the naive median prediction. These instances occurred during the 2017--18 season---in Week 5 for peak rate and in Weeks 5 and 20 for peak week. The ensemble trained on simulated data produced predictions of more stable quality. As in the main analysis, the ensemble's prediction error from the super learner trained in simulated data was similar to that of the discrete super learner, though the model selected as the discrete super learner varied by prediction target, season, and week.
+Across all prediction targets, the ensemble super learners trained on simulated and observed data both tended to improve on the naive median prediction using observed data from prior seasons (Figure  \@ref(fig:prosp-application), Web Figure 17). These improvements were more apparent in the 2017--18 influenza season which was more severe than 2016--17 and 2018--19 with respect to peak rate and cumulative hospitalizations. In addition, ensembles tended to produce predictions of similar quality across the flu season, while the ensemble trained only on observed data generated several predictions of much poorer quality than both the ensemble trained in simulated data and the naive median prediction. These instances occurred during the 2017--18 season---in Week 5 for peak rate and in Weeks 5 and 20 for peak week. The ensemble trained on simulated data produced predictions of more stable quality. As in the main analysis, the ensemble's prediction error from the super learner trained in simulated data was similar to that of the discrete super learner, though the model selected as the discrete super learner varied by prediction target, season, and week.
 
-When used to predict outcomes among the simulated influenza hospitalization curves, ensembles trained only on observed data exhibited higher prediction errors than those trained on simulated data for all prediction targets throughout most of the flu season (**Supplement Item, Figure 31**).
+When used to predict outcomes among the simulated influenza hospitalization curves, ensembles trained only on observed data exhibited higher prediction errors than those trained on simulated data for all prediction targets throughout most of the flu season (Web Figure 18).
 
 # Discussion
 
@@ -200,11 +186,11 @@ Tailoring the super learner to generate forecasts similar to those used in curre
 
 Our findings should be interpreted respecting several limitations. 
 
-First, we assumed the distribution of simulated curves accurately characterizes the hypothetical distribution of possible seasonal influenza hospitalization trajectories. We did not attempt to match simulated distributions to their empirical counterparts rigidly to allow for generating atypical influenza seasons that could be, but perhaps have not yet been, observed. Therefore, we assumed the 15 available empirical seasons do not capture the range of possible outcomes but do provide a reasonable basis for simulating the hypothetical distribution. Nonetheless, surveillance data likely underestimate influenza-attributable hospitalizations (*Supplemental Appendix*). 
+First, we assumed the distribution of simulated curves accurately characterizes the hypothetical distribution of possible seasonal influenza hospitalization trajectories. We did not attempt to match simulated distributions to their empirical counterparts rigidly to allow for generating atypical influenza seasons that could be, but perhaps have not yet been, observed. Therefore, we assumed the 15 available empirical seasons do not capture the range of possible outcomes but do provide a reasonable basis for simulating the hypothetical distribution. Nonetheless, surveillance data likely underestimate influenza-attributable hospitalizations (Web Appendix 1). 
 
 Second, we did not implement the super learner as a time series in which predictions are dynamically updated using previous weeks' predictions. Future work could explore "online" ensemble super learners of this sort [@Benkeser2018-if]. 
 
-Third, because we modeled seasonal influenza hospitalizations, our results do not apply to influenza pandemics. However, ensembles have become important tools for forecasting infectious disease pandemics in general (e.g., the SARS-CoV-2 pandemic [@CovidHub-2020-fh]).
+Third, because we modeled seasonal influenza hospitalizations, our results do not apply to influenza pandemics. However, ensembles have become important tools for forecasting infectious disease pandemics in general (e.g., the SARS-CoV-2 pandemic [https://viz.covid19forecasthub.org]).
 
 Finally, in our prospective subanalysis we held out empirical shape templates from seasons prior to the target season in order to re-train the ensemble. However, we did not resimulate the underlying curves to avoid including curves based on sampled parameters from the target season (e.g., peak rate). Thus, the ensemble trained in simulation data may have had an inherent advantage over the ensemble trained in empirical data.
 
@@ -222,24 +208,38 @@ We found that an ensemble super learner consistently outperformed a naive predic
 \newpage
 # Tables
 
-```{r tab.id="targtable", tab.cap="**Empirical distributions of peak hospitalization rate, peak hospitalization week, and cumulative hospitalization rate in the United States, 2003--2019.**"}
+<!-- TABLE ONE -->
+```{r table1, tab.id="targtable", tab.cap="Empirical distributions of peak hospitalization rate, peak hospitalization week, and cumulative hospitalization rate in the United States, 2003--2019.^a^"}
 
 targets <- fread(get_asset("TAB", "Prediction-Targets", simdat_date))
 targets <- targets[Season != "2009-10"]
 
-fn <- "Source: CDC FluView (Emerging Infections Program). Peak rate and cumulative rate expressed per 100,000 population. Pandemic influenza season 2009-2010 omitted."
-
 targets %>%
-  flextable(., cwidth = c(0.7, rep(1.2, 3))) %>%
+  flextable(., cwidth = c(0.7, rep(1.3, 3))) %>%
+  compose(.,
+    part = "header", j = "Peak rate",
+    value = as_paragraph("Peak rate", as_sup("b"))
+  ) %>%
+  compose(.,
+    part = "header", j = "Cumulative hospitalizations",
+    value = as_paragraph("Cumulative hospitalizations", as_sup("b"))
+  ) %>%
   bold(., part = "header") %>%
-  add_footer_lines(fn) %>%
   font(., fontname = global_table_font, part = "all")
 
 ```
+
+::: {custom-style="FlexTable Footnote"}
+^a^ Source: CDC FluView (Emerging Infections Program). Pandemic influenza season 2009-2010 omitted.
+
+^b^ Peak rate and cumulative hospitalizations expressed per 100,000 population. 
+:::
+
 \newpage
 
+<!-- TABLE TWO -->
+```{r table2, tab.id="candmodels-tuning-table", tab.cap="Component learners and tuning parameters."}
 
-```{r tab.id="candmodels-tuning-table", tab.cap="**Component learners and tuning parameters.**"}
 tunetab <- tribble(
   ~ Model,
   ~ `Tuning parameters`,
@@ -284,6 +284,9 @@ tunetab <- tribble(
 
 fn <-  as_paragraph(as_i("ncov"),  ", number of predictors. For the linear regression model, the variable-screening procedure is not a tuning parameter per se. We describe it in the \"tuning parameter\" column for ease of presentation. For the random forest and neural network learners, all combinations of the tuning parameters presented were proposed as separate learning algorithms.")
 
+linreg_row <- which(tunetab$Model %like% "Linear regression")
+nnet_rf_rows <- which(tunetab$Model %like% "Neural|Random forest")
+
 tt <- tunetab %>%
   flextable(., cwidth = c(1.9, 3.5, 1.2)) %>%
   fit_to_width(., max_width = 7.5) %>% 
@@ -292,33 +295,53 @@ tt <- tunetab %>%
   padding(padding = 7, part = "body") %>%
   align(j = 1:2, align = "left") %>%
   valign(valign = "top") %>%
-  add_footer_row(top = FALSE, colwidths = 3, values = "") %>%
+  ## add footnote superscripts
+  compose(., 
+    i = linreg_row,
+    j = "Model",
+    value = as_paragraph(tunetab$Model[linreg_row], as_sup("a"))
+  ) %>%
+  compose(.,
+    i = nnet_rf_rows,
+    j = "Model",
+    value = as_paragraph(tunetab$Model[nnet_rf_rows], as_sup("b"))
+  ) %>%
+  #add_footer_row(top = FALSE, colwidths = 3, values = "") %>%
   font(., fontname = global_table_font, part = "all")
 
 tt <- compose(tt, part = "footer", value = fn)
 tt
 ```
+
+::: {custom-style="FlexTable Footnote"}
+_ncov_, number of predictors
+
+^a^ For the linear regression model, the variable-screening procedure is not a tuning parameter _per se_. We describe it in the "tuning parameter" column for ease of presentation. 
+
+^b^ For the random forest and neural network learners, all combinations of the tuning parameters presented were proposed as separate learning algorithms.
+:::
+
 \newpage
 
+<!-- TABLE THREE -->
 
-```{r tab.id="main-analysis-risk-table", tab.cap="**Prediction risks for the ensemble and discrete super learner predictions of the peak hospitalization rate, peak hospitalization week, and cumulative hospitalization rate, by week of influenza season. Estimates presented as mean risk (standard error).**"}
+```{r table3, tab.id="main-analysis-risk-table", tab.cap="Prediction risks for the ensemble and discrete super learner predictions of the peak hospitalization rate, peak hospitalization week, and cumulative hospitalization rate, by week of influenza season.^a^ Estimates presented as mean risk (standard error)."}
 
 rt <- flextable(prwc_risks)
-esl_lab <- "EnsembleSL"
-dsl_lab <- "DiscreteSL"
+esl_lab <- as_paragraph("Ensemble SL", as_sup("b"))
+dsl_lab <- as_paragraph("Discrete SL", as_sup("c"))
 
 prwc_risks %>%
-  flextable(
-    cwidth = c(0.6, rep(1.1, 6))
+  flextable(cwidth = c(0.52, rep((6.5 - 0.52) / 6, 6))) %>%
+  compose(., 
+    part = "header",
+    j = rt$col_keys[which(rt$col_keys %like% "CV")],
+    value = esl_lab
   ) %>%
-  set_header_labels(
-    Week = "Week",
-    SuperLearnerCV.x = esl_lab,
-    DiscreteSL.x = dsl_lab,
-    SuperLearnerCV.y = esl_lab,
-    DiscreteSL.y = dsl_lab,
-    SuperLearnerCV = esl_lab,
-    DiscreteSL = dsl_lab
+  compose(.,
+    part = "header",
+    j = rt$col_keys[which(rt$col_keys %like% "Discrete")],
+    value = dsl_lab
   ) %>%
   add_header_row(
     top = TRUE,
@@ -329,44 +352,59 @@ prwc_risks %>%
   fontsize(size = 12, part = "header") %>%
   bold(., part = "header") %>%
   align(., j = 2:7, part = "all", align = "center") %>%
-  align(., part = "footer", align = "left") %>%
-  add_footer_lines(
-    risktabfn(c("Peak rate", "Peak week", "Cumulative rate")),
-  ) %>%
-  font(., fontname = global_table_font, part = "all")
+  font(., fontname = global_table_font, part = "all") %>%
+  fontsize(., size = 11, part = "all")
+```
 
+
+```{r table3-fn, results = "asis"}
+fullfn <- risktabfn(c("Peak rate", "Peak week", "Cumulative hospitalizations"))
+
+a_bit <- stringr::str_extract(fullfn, "The super learner.*$")
+b_bit <- stringr::str_extract(fullfn, "The ensemble super learner.*component model predictions\\.")
+c_bit <- stringr::str_extract(fullfn, "The discrete super learner.*component model\\.")
+
+cat(
+  "::: {custom-style='FlexTable Footnote'}", "\n",
+  "SL, Super Learner", "\n\n",
+  "^a^ ", a_bit, "\n\n",
+  "^b^ ", b_bit, "\n\n",
+  "^c^ ", c_bit, "\n\n",
+  ":::",
+  sep = ""
+)
 ```
 
 \newpage
 # Figures
 
-```{r empsim-compare, fig.asp = 2100/2400, echo = FALSE, fig.cap = "**Simulated distributions of hospitalization rates at each week (boxplots), by empirical shape template.** All simulated curves were based on linear trend filter fits using the $\\lambda_{min}$ trend filter penalty. Note that because each parameter used in the curve-generating function was drawn independently, simulated hospitalization curves based on an empirical shape template should have a similar shape (i.e., unimodal, bimodal) but may have different peak and/or cumulative hospitalization rates compared to the empirical template. Empirical data source: CDC, Emerging Infections Program (omitting 2009--2010 pandemic influenza season). See Supplemental Item 3 for an illustration of individual simulated curves based on each shape template.", message = F}
+```{r fig.id="empsim-compare", fig.width = 4, fig.asp = 13200/8400, echo = FALSE, fig.cap = "**Simulated distributions of hospitalization rates at each week (boxplots), by empirical shape template (black line).** All simulated curves were based on linear trend filter fits using the $\\lambda_{min}$ trend filter penalty. Note that because each parameter used in the curve-generating function was drawn independently, simulated hospitalization curves based on an empirical shape template should have a similar shape (i.e., unimodal, bimodal) but may have different peak and/or cumulative hospitalization rates compared to the empirical template. Empirical data source: CDC, Emerging Infections Program (omitting 2009--2010 pandemic influenza season). Influenza season (empirical template): A) 2003--04, B) 2004--05, C) 2005--06, D) 2006--07, E) 2008--09, F) 2010--11, G) 2011--12, H) 2012--13, I) 2013--14, J) 2015--16, K) 2016--17, L) 2017--18, M) 2018--19. See Web Figure 2 for an illustration of individual simulated curves based on each shape template.", message = F}
 
-knitr::include_graphics(
-         get_asset("FIG", "Simulation-Curves-by-Template-Boxplot", simdat_date)
-       )
+knitr::include_graphics(get_asset("FIG", "Simulation-Curves-by-Template-Boxplot"))
 ```
-\newpage
+<!-- \newpage -->
+<!-- uncomment if needed; figure takes up whole page -->
 
-```{r simcompare, fig.width = 6.5, fig.asp = 1440/3000, fig.cap="**Empirical (*N* = 15) vs. simulated (*N* = 15,000) target distributions. $\\lambda_{min}$, trend filter penalty used in the main analysis; $\\lambda_{SE}$, trend filter penalty used in the alternate trend filter penalty sensitivity analysis.**"}
+```{r fig.id="simcompare", fig.width = 6.5, fig.asp = 5760/13200, fig.cap="**Empirical (*N* = 15) vs. simulated (*N* = 15,000) target distributions. $\\lambda_{min}$, trend filter penalty used in the main analysis; $\\lambda_{SE}$, trend filter penalty used in the alternate trend filter penalty sensitivity analysis.** A) Peak hospitalization rate per 100,000 population; B) Peak week; C) Cumulative hospitalizations per 100,000 population."}
 
-knitr::include_graphics(
-         get_asset("FIG", "TargetDists-Emp-vs-Sim", simdat_date)
-       )
+knitr::include_graphics(get_asset("FIG", "TargetDists-Emp-vs-Sim"))
 ```
 
 \newpage
 
-```{r fig.id="ensemble-perf-main", fig.cap="**Cross-validated ensemble, component learner, and naive median prediction risks by week of simulated flu season and prediction target (main analysis).** Learners assigned zero weights by the metalearner are omitted. Pointranges display means and 95% confidence intervals for the ensemble prediction risks (natural log scale) in each week. Week 30 omitted from cumulative hospitalization rate to avoid distorting the y-axis; the true cumulative hospitalization rates are known to the algorithm at this point in the season.", fig.width = 4.8, fig.asp = 3000/3000}
+```{r fig.id="ensemble-perf-main", fig.cap="**Cross-validated ensemble, component learner, and naive median prediction risks by week of simulated flu season and prediction target (main analysis).** A) Peak hospitalization rate per 100,000 population; B) Peak week; C) Cumulative hospitalizations per 100,000 population. Learners assigned zero weights by the metalearner are omitted. Pointranges display means and 95% confidence intervals for the ensemble prediction risks (natural log scale) in each week. Week 30 omitted from cumulative hospitalization rate to avoid distorting the y-axis; the true cumulative hospitalization rates are known to the algorithm at this point in the season.", fig.width = 6.5, fig.asp = 7740/21000}
+
 knitr::include_graphics(get_asset("FIG", "Ensemble-Summary_All-Targets"))
 ```
 \newpage
 
-```{r fig.id="ensemble-perf-regscale", fig.cap="**Cross-validated ensemble prediction risks by week of simulated flu season, prediction target, and analysis.** Estimates plotted on the arithmetic scale for each prediction target. Pointranges display means and 95% confidence intervals for the ensemble prediction risks in each week.", fig.width = 6.5, fig.asp = 4800/13200}
+```{r fig.id="ensemble-perf-regscale", fig.cap="**Cross-validated ensemble prediction risks by week of simulated flu season, prediction target, and analysis.** A) Peak hospitalization rate per 100,000 population; B) Peak week; C) Cumulative hospitalizations per 100,00 population. Estimates plotted on the arithmetic scale for each prediction target. Pointranges display means and 95% confidence intervals for the ensemble prediction risks in each week. Main, main analysis; ATF, alternate trend filter penalty analysis; CS, component learner subset analysis.", fig.width = 6.5, fig.asp = 4800/13200}
+
 knitr::include_graphics(get_asset("FIG", "Ensemble-Summary_All-Targets_Regular-Scale"))
 ```
 
 \newpage
-```{r fig.id="prosp-application", fig.cap = "**Prospective assessment of two ensemble super learners---one trained on simulated data, the other on observed data---and a naive prediction based on observed data.** Peak rate and cumulative hospitalizations per 100,000 population.", fig.width = 5.5, fig.asp = 24000/18000}
+```{r fig.id="prosp-application", fig.cap = "**Prospective assessment of super learners trained on simulated data and observed data, as well as a naive prediction based on observed data.** Ensemble and discrete super learners are shown in each week for both super learner routines (i.e., trained on observed vs. simulated data). A) Peak rate, 2016--17 influenza season; B) Peak rate, 2017--18 influenza season; C) Peak rate, 2018--19 influenza season; D) Peak week, 2016--17 influenza season; E) Peak week, 2017--18 influenza season; F) Peak week, 2018--19 influenza season; G) Cumulative hospitalizations, 2016--17 inluenza season; H) Cumulative hospitalizations, 2017--18 influenza season; I) Cumulative hospitalizations, 2018--19 influenza season. Peak hospitalization rate and cumulative hospitalizations per 100,000 population.", fig.width = 5.5, fig.asp = 14400/14400}
+
 knitr::include_graphics(get_asset("FIG", "Prospective-Observed-Application"))
 ```
