@@ -1,0 +1,40 @@
+---
+title: "*American Journal of Epidemiology* Submitted Manuscript"
+---
+
+**Title:** "Predicting seasonal influenza hospitalizations using an ensemble super learner: a simulation study"
+
+```{r, include = FALSE}
+library(officer)
+sfp <- fp_text(
+  font.family = "Times New Roman",
+  vertical.align = "superscript"
+)
+```
+
+**Authors:** Jason R. Gantenberg, Kevin W. McConeghy, Chanelle J. Howe, Jon Steingrimsson, Robertus van Aalst, Ayman Chit, Andrew R. Zullo
+
+**Correspondence Address:** Correspondence to Dr. Jason R. Gantenberg, Department of Health Services, Policy and Practice, Brown University School of Public Health, Providence, RI 02912 (e-mail: [jrgant@brown.edu](mailto:jrgant@brown.edu))
+
+
+**Affiliations:** Department of Epidemiology, Brown University School of Public Health, Providence, Rhode Island (Jason R. Gantenberg, Andrew R. Zullo); Department of Health Services, Policy and Practice, Providence, Rhode Island (Jason R. Gantenberg, Kevin M. McConeghy, Andrew R. Zullo); Providence VA Medical Center, Providence, Rhode Island (Kevin M. McConeghy, Andrew R. Zullo); Center for Epidemiologic Research, Brown University School of Public Health, Providence, Rhode Island (Chanelle J. Howe); Department of Biostatistics, Brown University School of Public Health, Providence, Rhode Island (Jon Steingrimsson); Sanofi Pasteur, Swiftwater, Pennsylvania (Robertus van Aalst, Ayman Chit); Department of Health Sciences, University Medical Center Groningen, University of Groningen, Groningen, the Netherlands (Robertus van Aalst); Leslie Dan Faculty of Pharmacy, University of Toronto, Ontario, Canada (Ayman Chit)
+
+**Contributions:** J.R.G. helped to refine the study aims, formulated the analysis plan, implemented all coding and analyses, and drafted the initial version of the manuscript. K.W.M. and C.J.H. assisted in formulating the study goals and analysis plan and interpreting the results, in addition to critically revising the manuscript. J.S. reviewed and contributed to refining the statistical analysis, helped to interpret the results, and critically revised the manuscript. R.v.A. and A.C. conceived of the project aims, assisted in interpreting the results, and critically revised the manuscript. A.R.Z. helped to conceive of the project aims, formulate the study plan, and interpret the results, in addition to critically revising the manuscript. A.R.Z. and K.W.M. both supervised the project. All authors agreed to the submission of the final version.
+
+**Funding:** This Brown University collaborative research was funded by Sanofi Pasteur (PI: A.R.Z.). A.R.Z. was also supported, in part, by grants R21AG061632 and R01AG065722 from the National Institute on Aging and U54GM115677 from the National Institute of General Medical Sciences. In addition, A.R.Z. was supported by a US Department of Veterans Affairs Office of Academic Affiliations Advanced Fellowship in Health Services Research and Development.
+
+**Data Availability Statement:** The code necessary to reproduce these results and the output from the super learner procedures are provided in a repository at Open Science Framework (doi: [10.17605/OSF.IO/J64FX](https://doi.org/ vz010.17605/OSF.IO/J64FX)). These materials are also housed permanently at the Brown Digital Repository (doi: [10.26300/5xk0-zg33](https://doi.org/10.26300/5xk0-zg33)), and the package can be installed directly via the Github repository ([https://www.github.com/jrgant/FluHospPrediction](https://www.github.com/jrgant/FluHospPrediction)).
+
+**Thanks:** We would like to thank Dr. Ashley Naimi, Dr. Laura Balzer, and Dr. Nicholas Reich for their helpful comments concerning the study aims and the super learner approach, as well as Dr. Edward Thommes for his comments on an earlier draft of the manuscript. The super learner algorithm was fit using computational resources and services provided by the Center for Computation and Visualization at Brown University.
+
+**Conference Presentation:** Presented in part as a poster at the 2021 Society for Epidemiologic Research annual meeting (virtual), June 22--25, 2021.
+
+**Disclaimer:** The views expressed in this article are those of the authors and do not necessarily reflect the position or policy of the Department of Veterans Affairs or the United States Government.
+
+**Conflict of Interest:** K.W.M receives funding support from Seqirus pharmaceuticals and conducts investigator-initiated work for Pfizer.
+ 
+**Running Head:** Predicting Influenza Hospitalizations 
+ 
+**Keywords:** influenza, hospitalization, machine learning, forecasting, public health surveillance, epidemiologic methods
+
+**Abbrevations:** ILI, influenza-like illness; EIP, Emerging Infections Program
