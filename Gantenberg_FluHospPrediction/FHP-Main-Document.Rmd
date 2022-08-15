@@ -6,14 +6,10 @@ csl: american-journal-of-epidemiology.csl
 
 always_allow_html: true
 ---
-    
-**Journal:** American Journal of Epidemiology
 
 **Running Head:** Predicting Influenza Hospitalizations
 
 **Submission Type:** Original Contribution
-
-**Word Count (main text):** 4,336 / 4,000
 
 \newpage
     
@@ -44,7 +40,7 @@ We conducted a simulation study to examine the super learner's potential as a to
     
 ## Empirical data
 
-We downloaded publicly available surveillance data on seasonal influenza-related hospitalizations from the CDC's FluView Interactive dashboard [@Centers_for_Disease_Control_and_Prevention_undated-vt], using Emerging Infections Program (EIP) data beginning with the 2003--2004 season and ending with 2018--2019. We omitted the 2009--2010 pandemic influenza year due to dynamics that differ between pandemic and seasonal influenza and modified curves so that each flu season spanned 30 weeks (see **Web Appendix 1**). 
+We downloaded publicly available surveillance data on seasonal influenza-related hospitalizations from the CDC's FluView Interactive dashboard [@Centers_for_Disease_Control_and_Prevention_undated-vt], using Emerging Infections Program (EIP) data beginning with the 2003--2004 season and ending with 2018--2019. We omitted the 2009--2010 pandemic influenza year due to dynamics that differ between pandemic and seasonal influenza and modified curves so that each flu season spanned 30 weeks (see Web Appendix 1). 
 
 Hospitalization rates reported in FluSurv-NET, of which EIP represents a subset of surveillance sites, are calculated based on influenza-related hospitalizations among residents within a given catchment area. Cases are defined as hospitalizations accompanied by laboratory-confirmed influenza during the hospitalization or in the 14 days preceding it [@2021-influenza]. Rate denominators are the total population in the specified catchment area [@2021-influenza].
 
@@ -60,9 +56,9 @@ Fifteen empirical observations were available for each prediction target (Table 
 
 ## Simulating hospitalization curves
 
-To simulate seasonal influenza hospitalization curves, we adapted an approach developed by Brooks et al. to predict ILI [@Brooks2015-fl]. First, using the `genlasso` package in R [@Arnold-2019-gl; @RCore2020-ct], we fitted a linear trend filter [@Kim2009-bz; @Tibshirani2014-tr] to each of the 15 observed influenza hospitalization curves in the EIP. The linear trend filter is a penalized method that fits a piecewise linear function to a time series, testing multiple values of the penalty ($\lambda$) by default [@Arnold-2019-gl]. We used these fits as templates for the simulated influenza hospitalization curves (**Web Table 1**), choosing the $\lambda$ penalty via 5-fold cross-validation [@Brooks2015-fl]. In the main analysis we used the $\lambda$ value that minimized the trend filter's prediction error across the folds [@Brooks2015-fl], hereafter referred to as $\lambda_{min}$ **Web Figure 1**.
+To simulate seasonal influenza hospitalization curves, we adapted an approach developed by Brooks et al. to predict ILI [@Brooks2015-fl]. First, using the `genlasso` package in R [@Arnold-2019-gl; @RCore2020-ct], we fitted a linear trend filter [@Kim2009-bz; @Tibshirani2014-tr] to each of the 15 observed influenza hospitalization curves in the EIP. The linear trend filter is a penalized method that fits a piecewise linear function to a time series, testing multiple values of the penalty ($\lambda$) by default [@Arnold-2019-gl]. We used these fits as templates for the simulated influenza hospitalization curves (Web Table 1), choosing the $\lambda$ penalty via 5-fold cross-validation [@Brooks2015-fl]. In the main analysis we used the $\lambda$ value that minimized the trend filter's prediction error across the folds [@Brooks2015-fl], hereafter referred to as $\lambda_{min}$ Web Figure 1.
 
-Next, we used the resulting 15 trend filter fits in a slightly modified version of the curve generation scheme described by Brooks et al. (see **Web Appendix 2**), who conceptualize a seasonal influenza curve generically as a function of the week of the season, plus a noise term with mean 0 and variance $\tau^2$ [@Brooks2015-fl]. For each empirical season, we averaged the squared residuals from its trend filter fit over all weeks to estimate ${(\tau^s)}^2$.
+Next, we used the resulting 15 trend filter fits in a slightly modified version of the curve generation scheme described by Brooks et al. (see Web Appendix 2), who conceptualize a seasonal influenza curve generically as a function of the week of the season, plus a noise term with mean 0 and variance $\tau^2$ [@Brooks2015-fl]. For each empirical season, we averaged the squared residuals from its trend filter fit over all weeks to estimate ${(\tau^s)}^2$.
 
 For each simulated curve, we sampled each of the following parameters randomly and independently:
 
@@ -80,15 +76,15 @@ tmpcts <- fread(
 )
 ```
 
-We simulated 15,000 curves, where each empirical shape template was used to simulate between `r tmpcts[, min(as.numeric(stringr::str_remove(N, ",")))]` and `r tmpcts[, format(max(as.numeric(stringr::str_remove(N, ","))), big.mark = ",")]` curves. We considered the resultant set of simulated curves to be a plausible distribution of hypothetical flu seasons that could be observed in principle [@Brooks2015-fl] (**Figure \@ref(fig:empsim-compare)**). While the simulated distributions of prediction targets differed from the empirical distributions (**Figure \@ref(fig:simcompare)**), only 15 empirical seasons were available and may not capture the range of possible hospitalization curves [@Brooks2015-fl].
+We simulated 15,000 curves, where each empirical shape template was used to simulate between `r tmpcts[, min(as.numeric(stringr::str_remove(N, ",")))]` and `r tmpcts[, format(max(as.numeric(stringr::str_remove(N, ","))), big.mark = ",")]` curves. We considered the resultant set of simulated curves to be a plausible distribution of hypothetical flu seasons that could be observed in principle [@Brooks2015-fl] (Figure \@ref(fig:empsim-compare)). While the simulated distributions of prediction targets differed from the empirical distributions (Figure \@ref(fig:simcompare)), only 15 empirical seasons were available and may not capture the range of possible hospitalization curves [@Brooks2015-fl].
 
 ## Super learner
   
 The super learner produces an ensemble prediction that is a weighted linear combination of predictions from a set of component prediction algorithms, where weights are selected by minimizing a user-specified loss function that determines the target for which the ensemble's predictions are optimized (e.g., conditional outcome mean) [@Van_der_Laan2007-ml; @Polley2010-cb; @Polley2011-oz]. The super learner takes as inputs a data set, prediction algorithms (component learners), and a loss function. Component learners could include parametric models (e.g., generalized linear models), semi-parametric models, and machine-learning algorithms (e.g., neural networks), among others [@Naimi2018-fv].
 
-For each prediction target in the current study we specified the same library of learners and measured the component and ensemble super learners' performance using the absolute error loss, the average absolute difference between model predictions and the true "observed" values in the simulated data set [@Polley2011-oz]. This loss function targets the conditional median of the outcome distribution [@Polley2011-oz]---for example, median peak hospitalization rate---which we selected due to skewness in the simulated peak week and cumulative hospitalization distributions (**Figure \@ref(fig:simcompare)**). 
+For each prediction target in the current study we specified the same library of learners and measured the component and ensemble super learners' performance using the absolute error loss, the average absolute difference between model predictions and the true "observed" values in the simulated data set [@Polley2011-oz]. This loss function targets the conditional median of the outcome distribution [@Polley2011-oz]---for example, median peak hospitalization rate---which we selected due to skewness in the simulated peak week and cumulative hospitalization distributions (Figure \@ref(fig:simcompare)). 
 
-We implemented the super learner using the `sl3` package in R [@Coyle2020-ze]. Progressing sequentially through the flu season, we ran the super learner at each week *i* to predict the season-level target of interest as a function of current and past hospitalization rates. All component learners included the following predictor variables (see **Web Appendix 3** for an exception; rates per 100,000 population):
+We implemented the super learner using the `sl3` package in R [@Coyle2020-ze]. Progressing sequentially through the flu season, we ran the super learner at each week *i* to predict the season-level target of interest as a function of current and past hospitalization rates. All component learners included the following predictor variables (see Web Appendix 3 for an exception; rates per 100,000 population):
 
   * hospitalization rate in week *i*, 
   * cumulative rate through week *i*,
@@ -113,14 +109,14 @@ We repeated the following procedure for each prediction target:
    c. Regress simulated outcomes on the component predictions to create a linear weighted combination of the individual learners' predictions via a "metalearner" model set to optimize for the absolute error loss [@Van_der_Laan2007-ml; @Coyle2020-ze; @Naimi2018-fv].
    d. Fit the ensemble in the full data and calculate its prediction risk.
 
-For each prediction target and at each week of the season, we trained 76 component models, including variations on tuning and input parameters (**Table \@ref(tab:candmodels-tuning-table)**). We used the `sl3` [@Coyle2020-ze] package's default (`solnp` function [@Ghalanos2015-sn]) as the metalearner. 
+For each prediction target and at each week of the season, we trained 76 component models, including variations on tuning and input parameters (Table \@ref(tab:candmodels-tuning-table)). We used the `sl3` [@Coyle2020-ze] package's default (`solnp` function [@Ghalanos2015-sn]) as the metalearner. 
 
 The procedure outlined above yields cross-validated prediction risks for each component learner and an in-sample prediction risk for the ensemble super learner. Because in-sample risks may underestimate prediction error, we also cross-validated the ensemble super learner's prediction risks by repeating the procedure outlined above in nested fashion. Holding out each of the 15 data folds in turn, we fit the super learner algorithm within the corresponding training set and measured the resulting ensemble's prediction risk in the holdout fold. We then averaged the 15 fold-specific risks yielded by this procedure in order to estimate the cross-validated ensemble risk. Following calculations implemented in the `sl3` package [@Coyle2020-ze], we estimated the standard error for this cross-validated risk by dividing the standard deviation of risks across the 15 validation folds by the square root of 15,000, the total number of simulated outcomes.
 
 
 ## Component models
 
-Theory and finite-sample demonstrations indicate the super learner should benefit from using a variety of component models, even if some models perform poorly [@Van_der_Laan2007-ml]. Therefore, we specified a variety of component learners and tuning parameters (e.g., kernels, complexity penalties) to probe a diverse set of prediction algorithms. We used component learners provided in the `sl3` [@Coyle2020-ze] and `SuperLearner` [@Polley2019-sl] packages in R (**Web Appendix 3**).
+Theory and finite-sample demonstrations indicate the super learner should benefit from using a variety of component models, even if some models perform poorly [@Van_der_Laan2007-ml]. Therefore, we specified a variety of component learners and tuning parameters (e.g., kernels, complexity penalties) to probe a diverse set of prediction algorithms. We used component learners provided in the `sl3` [@Coyle2020-ze] and `SuperLearner` [@Polley2019-sl] packages in R (Web Appendix 3).
  
 For each prediction target, we compared the ensemble super learner's performance against the discrete super learner and a naive prediction (the outcome median). We also used cross-validation to calculate the naive prediction's error: for each validation set we used the outcome median from the training set as the prediction and averaged the fold-specific risks to get the cross-validated risk.
  
@@ -128,7 +124,7 @@ For each prediction target, we compared the ensemble super learner's performance
 
 We conducted three sensitivity analyses to explore the ensemble learner's performance under different analytic choices. 
 
-First, we simulated curves using an alternate penalty in the linear trend filter ($\lambda_{SE}$), selected as the $\lambda$ that produced a cross-validated error estimate within one standard error of the prediction error produced by $\lambda_{min}$ [@Arnold-2019-gl] (**Web Figure 3**).
+First, we simulated curves using an alternate penalty in the linear trend filter ($\lambda_{SE}$), selected as the $\lambda$ that produced a cross-validated error estimate within one standard error of the prediction error produced by $\lambda_{min}$ [@Arnold-2019-gl] (Web Figure 3).
 
 Second, we included only the elastic net and random forest learners, based on their good performance in the main analysis. This post-hoc analysis compared the quality of predictions produced by the ensemble super learner when given a smaller subset of well-performing component learners.
 
@@ -328,11 +324,11 @@ _ncov_, number of predictors
 ```{r table3, tab.id="main-analysis-risk-table", tab.cap="Prediction risks for the ensemble and discrete super learner predictions of the peak hospitalization rate, peak hospitalization week, and cumulative hospitalization rate, by week of influenza season.^a^ Estimates presented as mean risk (standard error)."}
 
 rt <- flextable(prwc_risks)
-esl_lab <- as_paragraph("Ensemble SL", as_sup("b"))
-dsl_lab <- as_paragraph("Discrete SL", as_sup("c"))
+esl_lab <- as_paragraph("EnsembleSL", as_sup("b"))
+dsl_lab <- as_paragraph("DiscreteSL", as_sup("c"))
 
 prwc_risks %>%
-  flextable(cwidth = c(0.52, rep((6.5 - 0.52) / 6, 6))) %>%
+  flextable(cwidth = c(0.52, rep((6.6 - 0.52) / 6, 6))) %>%
   compose(., 
     part = "header",
     j = rt$col_keys[which(rt$col_keys %like% "CV")],
@@ -349,9 +345,10 @@ prwc_risks %>%
     colwidths = c(1, 2, 2, 2)
   ) %>%
   theme_booktabs() %>%
-  fontsize(size = 12, part = "header") %>%
+  fontsize(size = 11, part = "header") %>%
   bold(., part = "header") %>%
   align(., j = 2:7, part = "all", align = "center") %>%
+  line_spacing(., part = "body", space = 0.75) %>%
   font(., fontname = global_table_font, part = "all") %>%
   fontsize(., size = 11, part = "all")
 ```
@@ -366,7 +363,7 @@ c_bit <- stringr::str_extract(fullfn, "The discrete super learner.*component mod
 
 cat(
   "::: {custom-style='FlexTable Footnote'}", "\n",
-  "SL, Super Learner", "\n\n",
+  "SL, super learner", "\n\n",
   "^a^ ", a_bit, "\n\n",
   "^b^ ", b_bit, "\n\n",
   "^c^ ", c_bit, "\n\n",
