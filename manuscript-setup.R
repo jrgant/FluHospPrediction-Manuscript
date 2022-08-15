@@ -25,8 +25,7 @@ opts_chunk$set(
 )
 
 # paper output directory
-assetdir <-
-  "~/HDD/projects/FluHospPrediction/results/00_paper_output/"
+assetdir <- "~/HDD/projects/FluHospPrediction/results/00_paper_output/"
 
 # table font
 global_table_font <- "Times New Roman"
