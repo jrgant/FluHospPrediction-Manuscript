@@ -1,6 +1,5 @@
+# knitters
 main_allfiles: main main_docx2pdf
-
-#supp_allfiles: supp supp_docx2pdf
 
 main:
 	Rscript -e "source('knitscript.R')"
@@ -11,15 +10,10 @@ supp:
 main_docx2pdf:
 	soffice --convert-to pdf --headless FHP-Main-Document.docx
 
-# supp_docx2pdf:
-# 	soffice --convert-to pdf --headless FHP-Supplement.docx
-
-coverpage:
-	Rscript -e "source('knitscript-cover.R')"
-
 coverpage-aje:
 	Rscript -e "source('knitscript-cover-aje.R')"
 
+# openers
 omain:
 	soffice FHP-Main-Document.docx
 
