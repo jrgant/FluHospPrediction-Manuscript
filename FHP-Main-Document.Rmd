@@ -350,7 +350,7 @@ prwc_risks %>%
   align(., j = 2:7, part = "all", align = "center") %>%
   line_spacing(., part = "body", space = 0.75) %>%
   font(., fontname = global_table_font, part = "all") %>%
-  fontsize(., size = 11, part = "all")
+  fontsize(., size = 10, part = "all")
 ```
 
 

@@ -31,8 +31,8 @@ assetdir <- "~/HDD/projects/FluHospPrediction/results/00_paper_output/"
 global_table_font <- "Times New Roman"
 
 # function to get a set of files based on their creation date
-global_date <- "2022-08-09"     # set accordingly
-simdat_date <- "2022-02-02"
+global_date <- "2022-08-16"     # set accordingly
+simdat_date <- "2022-08-16"
 
 get_asset <- function(type, descr, date = global_date, pdfout = TRUE) {
 

@@ -543,7 +543,7 @@ include_graphics(get_asset("FIG", slug, date = simdat_date, pdfout = F))
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-simtemplate-rand, results = "asis", fig.asp = 1800/2250}
+```{r supp-simtemplate-rand, results = "asis", out.width = "90%", fig.asp = 1.25}
 slug <- "Simulation-Curves-by-Template-Rand10"
 supp_cap(slug)
 include_graphics(get_asset("FIG", slug))
