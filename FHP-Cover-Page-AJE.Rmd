@@ -31,7 +31,7 @@ sfp <- fp_text(
 
 **Disclaimer:** The views expressed in this article are those of the authors and do not necessarily reflect the position or policy of the Department of Veterans Affairs or the United States Government.
 
-**Conflict of Interest:** K.W.M receives funding support from Seqirus pharmaceuticals and conducts investigator-initiated work for Pfizer.
+**Conflict of Interest:** J.R.G. receives research funding support from Sanofi (PI: A.R.Z.). K.W.M receives funding support from Seqirus pharmaceuticals and conducts investigator-initiated work for Pfizer.
  
 **Running Head:** Predicting Influenza Hospitalizations 
  
