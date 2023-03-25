@@ -6,8 +6,16 @@ csl: american-journal-of-epidemiology.csl
 
 always_allow_html: true
 
+# hattip for captions
+# https://stackoverflow.com/questions/39139424/r-markdown-change-default-pdf-table-caption-prefix
 header-includes:
   - \usepackage{bm}
+  - \usepackage{caption}
+  - \captionsetup[table]{name=Web Table,labelfont=sc,labelsep=period,skip=18pt}
+  - \captionsetup[figure]{name=Web Figure,format=hang,labelfont=sc,labelsep=period}
+  - \usepackage{tocloft}
+  - \setlength{\cftbeforetabskip}{14pt}
+  - \setlength{\cftbeforefigskip}{16pt}
 ---
 
 Jason R. Gantenberg^1,2^ Kevin W. McConeghy,^2,3^ Chanelle J. Howe,^4^ Jon Steingrimsson,^5^ Robertus van Aalst,^6,7^, Ayman Chit,^6,8^, Andrew R. Zullo^1,2,3^
@@ -39,6 +47,12 @@ jrgant@brown.edu
 
 \newpage
 \tableofcontents
+
+\newpage
+\listoftables
+
+\newpage
+\listoffigures
 
 \newpage
 
@@ -195,24 +209,29 @@ For the peak rate prediction target, the ensemble super learner's predictions ex
 
 \bibliography{references}
 <div id="refs"></div>
+
 \newpage
 
 # Web Tables 
 
+```{r supptable-function}
+supptable <- function(x, ...) {
+  kbl(x, booktabs = TRUE, caption = supp_cap(slug), ...) %>%
+    kable_styling(latex_options = c(position = "H"))
+}
+```
+
+
 <!-- SUPPLEMENTAL TABLE -->
 
 ```{r supp-simtemplate-counts, results = "asis"}
+
+knitr::opts_chunk$set(tab.cap.pre = "Who")
 slug <- "Simulation-Template-Counts"
 tmpcts <- fread(get_asset("TAB", slug))
 
-supp_cap(slug)
-
 tmpcts %>%
-  flextable %>%
-  bold(part = "header") %>%
-  theme_booktabs() %>%
-  font(., fontname = global_table_font, part = "all") %>%
-  autofit
+  supptable()
 ```
 \newpage
 
@@ -228,14 +247,8 @@ slug <- "Risk-Week_Peak-Rate"
 rwsum_pr <- fread(get_asset("TAB", slug))
 
 ## round numeric columns
-
-supp_cap(slug)
-
 rwsum_pr[, (rdcols) := lapply(.SD, roundit), .SDcols = rdcols][] %>%
-  flextable(cwidth = c(0.51, rep((6 - 0.51) / 5, 5))) %>%
-  bold(., part = "header") %>%
-  padding(padding = 0, part = "all") %>%
-  font(., fontname = global_table_font, part = "all")
+  supptable()
 ```
 \newpage
 
@@ -246,16 +259,11 @@ slug <- "Risk-Week_Peak-Week"
 rwsum_pw <- fread(get_asset("TAB", slug))
 
 ## round numberic columns
-
-supp_cap(slug)
-
 rwsum_pw[, (rdcols) := lapply(.SD, roundit), .SDcols = rdcols][] %>%
-  flextable(cwidth = c(0.51, rep((6 - 0.51) / 5, 5))) %>%
-  bold(., part = "header") %>%
-  padding(padding = 0, part = "all") %>%
-  font(., fontname = global_table_font, part = "all")
+  supptable()
 ```
 \newpage
+
 
 <!-- SUPPLEMENTAL TABLE -->
 
@@ -263,227 +271,207 @@ rwsum_pw[, (rdcols) := lapply(.SD, roundit), .SDcols = rdcols][] %>%
 slug <- "Risk-Week_Cum-Hosp"
 rwsum_ch <- fread(get_asset("TAB", slug))
 
-
-supp_cap(slug)
-
 rwsum_ch[, (rdcols) := lapply(.SD, roundit), .SDcols = rdcols][] %>%
-  flextable(cwidth = c(0.51, rep((6 - 0.51) / 5, 5))) %>%
-  bold(., part = "header") %>%
-  padding(padding = 0, part = "all") %>%
-  font(., fontname = global_table_font, part = "all")
+  supptable()
 ```
 \newpage
 
-<!-- SUPPLEMENTAL TABLE -->
 
+<!-- SUPPLEMENTAL TABLE -->
 
 <!-- h/t for minipage layouts https://latex-tutorial.com/minipage-latex/ -->
 
-```{r supp-peakrate-risks-lse-cap, results = "asis"}
-slug <- "Risks-EDSL-Mean_PeakRate-L1SE"
-pkrate_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
+```{r risktab-colnames}
+risktab_colnames <- c(Week = "Week",
+                      SuperLearnerCV = "EnsembleSL",
+                      DiscreteSL = "DiscreteSL")
 ```
 
+```{=latex}
 \begin{minipage}{0.5\textwidth}
+```
 
 ```{r supp-peakrate-risks-lse-tab, results = "asis"}
-pkrate_risks %>%
-  flextable(
-    cwidth = c(0.51, rep(1.2, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  align(part = "all", align = "center") %>%
-  #add_footer_lines(risktabfn("Peak rate")) %>%
-  font(., fontname = global_table_font, part = "all")
+slug <- "Risks-EDSL-Mean_PeakRate-L1SE"
+pkrate_risks <- fread(get_asset("TAB", slug))
+pkrate_risks %>% supptable(col.names = risktab_colnames)
+
 ```
+
+```{=latex}
 \end{minipage}
 \hspace{0.05\textwidth}
 \begin{minipage}{0.4\textwidth}
+```
+
 ```{r supp-peakrate-risks-lse-fn, results = "asis"}
 cat(risktabfn("Peak rate"))
 ```
+
+```{=latex}
 \end{minipage}
+```
 
 \newpage
 
 <!-- SUPPLEMENTAL TABLE -->
 
-
-```{r supp-peakweek-risks-lse-cap, results = "asis"}
-supp_cap(slug)
-```
+```{=latex}
 \begin{minipage}{0.5\textwidth}
+```
 
 ```{r supp-peakweek-risks-lse-tab, results = "asis"}
 slug <- "Risks-EDSL-Mean_PeakWeek-L1SE"
 pkweek_risks <- fread(get_asset("TAB", slug))
-
-
-pkweek_risks %>%
-  flextable(
-    cwidth = c(0.51, rep(1.2, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  align(part = "all", align = "center") %>%
-  #add_footer_lines(risktabfn("Peak week")) %>%
-  font(., fontname = global_table_font, part = "all")
+pkweek_risks %>% supptable(col.names = risktab_colnames)
 ```
+
+```{=latex}
 \end{minipage}
 \hspace{0.05\textwidth}
 \begin{minipage}{0.4\textwidth}
+```
+
 ```{r supp-peakweek-risks-lse-fn, results = "asis"}
 cat(risktabfn("Peak week"))
 ```
+
+```{=latex}
 \end{minipage}
-
+```
 \newpage
-
 
 <!-- SUPPLEMENTAL TABLE -->
 
-```{r supp-cumhosp-risks-lse-cap, results = "asis"}
+
+```{=latex}
+\begin{minipage}{0.5\textwidth}
+```
+
+```{r supp-cumhosp-risks-lse-tab, results = "asis"}
 slug <- "Risks-EDSL-Mean_CumHosp-L1SE"
 cumhosp_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
+cumhosp_risks %>% supptable(col.names = risktab_colnames)
 ```
 
-\begin{minipage}{0.5\textwidth}
-```{r supp-cumhosp-risks-lse-tab, results = "asis"}
-cumhosp_risks %>%
-  flextable(
-    cwidth = c(0.51, rep(1.2, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  align(part = "all", align = "center") %>%
-  #add_footer_lines(risktabfn("Cumulative hospitalizations")) %>%
-  font(., fontname = global_table_font, part = "all")
-```
+```{=latex}
 \end{minipage}
 \hspace{0.05\textwidth}
 \begin{minipage}{0.4\textwidth}
+```
+
 ```{r supp-cumhosp-risks-lse-fn, results = "asis"}
 cat(risktabfn("Cumulative hospitalizations"))
 ```
+
+```{=latex}
 \end{minipage}
+```
 
 \newpage
 
+
 <!-- SUPPLEMENTAL TABLE -->
 
-```{r supp-peakrate-risks-erf-cap, results = "asis"}
+```{=latex}
+\begin{minipage}{0.5\textwidth}
+```
+
+```{r supp-peakrate-risks-erf-tab, results = "asis"}
 slug <- "Risks-EDSL-Mean_PeakRate-ERF"
 pkrate_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
+pkrate_risks %>% supptable(col.names = risktab_colnames)
 ```
 
-\begin{minipage}{0.5\textwidth}
-```{r supp-peakrate-risks-erf-tab, results = "asis"}
-pkrate_risks %>%
-  flextable(
-    cwidth = c(0.51, rep(1.2, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  align(part = "all", align = "center") %>%
-  #add_footer_lines(risktabfn("Peak rate")) %>%
-  font(., fontname = global_table_font, part = "all")
-```
+```{=latex}
 \end{minipage}
 \hspace{0.05\textwidth}
 \begin{minipage}{0.4\textwidth}
+```
+
 ```{r supp-peakrate-risks-erf-fn, results = "asis"}
 cat(risktabfn("Peak rate"))
 ```
+
+```{=latex}
 \end{minipage}
+```
 
 \newpage
 
+
 <!-- SUPPLEMENTAL TABLE -->
 
-```{r supp-peakweek-risks-erf-cap, results = "asis"}
-slug <- "Risks-EDSL-Mean_PeakWeek-ERF"
-pkweek_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
-```
-
+```{=latex}
 \begin{minipage}{0.5\textwidth}
+```
 
 ```{r supp-peakweek-risks-erf-tab, results = "asis"}
-pkweek_risks %>%
-  flextable(
-    cwidth = c(0.51, rep(1.2, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  align(part = "all", align = "center") %>%
-  #add_footer_lines(risktabfn("Peak week")) %>%
-  font(., fontname = global_table_font, part = "all")
+slug <- "Risks-EDSL-Mean_PeakWeek-ERF"
+pkweek_risks <- fread(get_asset("TAB", slug))
+pkweek_risks %>% supptable(col.names = risktab_colnames)
 ```
+
+```{=latex}
 \end{minipage}
 \hspace{0.05\textwidth}
 \begin{minipage}{0.4\textwidth}
+```
+
 ```{r supp-peakweek-risks-erf-fn, results = "asis"}
 cat(risktabfn("Peak week"))
 ```
-\end{minipage}
 
+```{=latex}
+\end{minipage}
+```
 \newpage
+
 
 <!-- SUPPLEMENTAL TABLE -->
 
-```{r supp-cumhosp-risks-erf-cap, results = "asis"}
+```{=latex}
+\begin{minipage}{0.5\textwidth}
+```
+
+```{r supp-cumhosp-risks-erf-tab, results = "asis"}
 slug <- "Risks-EDSL-Mean_CumHosp-ERF"
 cumhosp_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
+cumhosp_risks %>% supptable(col.names = risktab_colnames)
 ```
 
-\begin{minipage}{0.5\textwidth}
-```{r supp-cumhosp-risks-erf-tab, results = "asis"}
-cumhosp_risks %>%
-  flextable(
-    cwidth = c(0.51, rep(1.2, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  align(part = "all", align = "center") %>%
-  #add_footer_lines(risktabfn("Cumulative rate")) %>%
-  font(., fontname = global_table_font, part = "all")
-```
+```{=latex}
 \end{minipage}
 \hspace{0.05\textwidth}
 \begin{minipage}{0.4\textwidth}
+```
+
 ```{r supp-cumhosp-risks-erf-fn, results = "asis"}
 cat(risktabfn("Cumulative hospitalizations"))
 ```
+
+```{=latex}
 \end{minipage}
+```
+
 \newpage
+
 
 <!-- SUPPLEMENTAL TABLE -->
 
 ```{r supp-peakrate-risks-sqe, results = "asis"}
+risktabfn_sqe <- function(...) {
+  cat("\\makebox[\\textwidth][c]{")
+  cat("\\begin{minipage}{4.5in}")
+  cat(risktabfn(..., sqe = TRUE))
+  cat("\\end{minipage}")
+  cat("}")
+}
+
 slug <- "Risks-EDSL-Mean_PeakRate-SQE"
 pkrate_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
-
-pkrate_risks %>%
-  flextable(
-    cwidth = c(0.51, rep(1.2, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  align(part = "all", align = "center") %>%
-  add_footer_lines(risktabfn("Peak rate", sqe = TRUE)) %>%
-  font(., fontname = global_table_font, part = "all")
+pkrate_risks %>% supptable(col.names = risktab_colnames)
+risktabfn_sqe("Peak rate")
 ```
 \newpage
 
@@ -492,38 +480,19 @@ pkrate_risks %>%
 ```{r supp-peakweek-risks-sqe, results = "asis"}
 slug <- "Risks-EDSL-Mean_PeakWeek-SQE"
 pkweek_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
-
-pkweek_risks %>%
-  flextable(
-    cwidth = c(0.51, rep(1.2, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  align(part = "all", align = "center") %>%
-  add_footer_lines(risktabfn("Peak week", sqe = TRUE)) %>%
-  font(., fontname = global_table_font, part = "all")
+pkweek_risks %>% supptable(col.names = risktab_colnames)
+risktabfn_sqe("Peak week")
 ```
 \newpage
+
 
 <!-- SUPPLEMENTAL TABLE -->
 
 ```{r supp-cumhosp-risks-sqe, results = "asis"}
 slug <- "Risks-EDSL-Mean_CumHosp-SQE"
 cumhosp_risks <- fread(get_asset("TAB", slug))
-
-supp_cap(slug)
-
-cumhosp_risks %>%
-  flextable(
-    cwidth = c(0.51, rep(1.2, 2))
-  ) %>%
-  risktab_cnames_word() %>%
-  bold(., part = "header") %>%
-  align(part = "all", align = "center") %>%
-  add_footer_lines(risktabfn("Cumulative rate", sqe = TRUE)) %>%
-  font(., fontname = global_table_font, part = "all")
+cumhosp_risks %>% supptable(col.names = risktab_colnames)
+risktabfn_sqe("Cumulative hospitalizations")
 ```
 \newpage
 
@@ -532,9 +501,8 @@ cumhosp_risks %>%
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-tf-pred-lmin, results = "asis", fig.asp = 1800/2250}
-slug <- "TF-Predictions_lambda.min"
-supp_cap(slug)
+`r slug <- "TF-Predictions_lambda.min"`
+```{r supp-tf-pred-lmin, results = "asis", fig.asp = 1800/2250, fig.cap = supp_cap(slug)}
 # set pdfout to FALSE because of hyphen rendering issue 
 include_graphics(get_asset("FIG", slug, date = simdat_date, pdfout = F))
 ```
@@ -543,18 +511,17 @@ include_graphics(get_asset("FIG", slug, date = simdat_date, pdfout = F))
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-simtemplate-rand, results = "asis", out.width = "90%", fig.asp = 1.25}
-slug <- "Simulation-Curves-by-Template-Rand10"
-supp_cap(slug)
+`r slug <- "Simulation-Curves-by-Template-Rand10"`
+```{r supp-simtemplate-rand, results = "asis", out.width = "90%", fig.asp = 1.25, fig.cap = supp_cap(slug)}
+knitr::opts_current$set(fig.cap = supp_cap(slug))
 include_graphics(get_asset("FIG", slug))
 ```
 \newpage
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-tfpred-lse, results = "asis", fig.asp = 1800/2250}
-slug <- "TF-Predictions_lambda.1se"
-supp_cap(slug)
+`r slug <- "TF-Predictions_lambda.1se"`
+```{r supp-tfpred-lse, results = "asis", fig.asp = 1800/2250, fig.cap = supp_cap(slug)}
 # set pdfout to FALSE because of hyphen rendering issue
 include_graphics(get_asset("FIG", slug, date = simdat_date, pdfout = F))
 ```
@@ -562,9 +529,8 @@ include_graphics(get_asset("FIG", slug, date = simdat_date, pdfout = F))
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-peakrate-risktiles, results = "asis", fig.asp = 1950/3600}
-slug <- "Risktiles_Peak-Rate"
-supp_cap(slug)
+`r slug <- "Risktiles_Peak-Rate"`
+```{r supp-peakrate-risktiles, results = "asis", fig.asp = 1950/3600, fig.cap = supp_cap(slug)}
 knitr::include_graphics(get_asset("FIG", slug))
 ```
 
@@ -572,45 +538,40 @@ knitr::include_graphics(get_asset("FIG", slug))
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-peakweek-risktiles, results = "asis", fig.asp = 1950/3600}
-slug <- "Risktiles_Peak-Week"
-supp_cap(slug)
+`r slug <- "Risktiles_Peak-Week"`
+```{r supp-peakweek-risktiles, results = "asis", fig.asp = 1950/3600, fig.cap = supp_cap(slug)}
 knitr::include_graphics(get_asset("FIG", slug))
 ```
 \newpage
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-cumhosp-risktiles, results = "asis", fig.asp = 1950/3600}
-slug <- "Risktiles_Cum-Hosp"
-supp_cap(slug)
+`r slug <- "Risktiles_Cum-Hosp"`
+```{r supp-cumhosp-risktiles, results = "asis", fig.asp = 1950/3600, fig.cap = supp_cap(slug)}
 knitr::include_graphics(get_asset("FIG", slug))
 ```
 \newpage
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-peakrate-risktiles-lse, results = "asis", fig.asp = 1800/3600}
-slug <- "Risktiles_Peak-Rate-L1SE"
-supp_cap(slug)
+`r slug <- "Risktiles_Peak-Rate-L1SE"`
+```{r supp-peakrate-risktiles-lse, results = "asis", fig.asp = 1800/3600, fig.cap = supp_cap(slug)}
 knitr::include_graphics(get_asset("FIG", slug))
 ```
 \newpage
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-peakweek-risktiles-lse, results = "asis", fig.asp = 1800/3600}
-slug <- "Risktiles_Peak-Week-L1SE"
-supp_cap(slug)
+`r slug <- "Risktiles_Peak-Week-L1SE"`
+```{r supp-peakweek-risktiles-lse, results = "asis", fig.asp = 1800/3600, fig.cap = supp_cap(slug)}
 knitr::include_graphics(get_asset("FIG", slug))
 ```
 \newpage
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-cumhosp-risktiles-lse, results = "asis", fig.asp = 1800/3600}
-slug <- "Risktiles_Cum-Hosp-L1SE"
-supp_cap(slug)
+`r slug <- "Risktiles_Cum-Hosp-L1SE"`
+```{r supp-cumhosp-risktiles-lse, results = "asis", fig.asp = 1800/3600, fig.cap = supp_cap(slug)}
 knitr::include_graphics(get_asset("FIG", slug))
 ```
 \newpage
@@ -618,63 +579,56 @@ knitr::include_graphics(get_asset("FIG", slug))
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-peakrate-risktiles-erf, results = "asis", fig.asp = 1950/3600}
-slug <- "Risktiles_Peak-Rate-ERF"
-supp_cap(slug)
+`r slug <- "Risktiles_Peak-Rate-ERF"`
+```{r supp-peakrate-risktiles-erf, results = "asis", fig.asp = 1950/3600, fig.cap = supp_cap(slug)}
 knitr::include_graphics(get_asset("FIG", slug))
 ```
 \newpage
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-peakweek-risktiles-erf, results = "asis", fig.asp = 1950/3600}
-slug <- "Risktiles_Peak-Week-ERF"
-supp_cap(slug)
+`r slug <- "Risktiles_Peak-Week-ERF"`
+```{r supp-peakweek-risktiles-erf, results = "asis", fig.asp = 1950/3600, fig.cap = supp_cap(slug)}
 knitr::include_graphics(get_asset("FIG", slug))
 ```
 \newpage
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-cumhosp-risktiles-erf, results = "asis", fig.asp = 1950/3600}
-slug <- "Risktiles_Cum-Hosp-ERF"
-supp_cap(slug)
+`r slug <- "Risktiles_Cum-Hosp-ERF"`
+```{r supp-cumhosp-risktiles-erf, results = "asis", fig.asp = 1950/3600, fig.cap = supp_cap(slug)}
 knitr::include_graphics(get_asset("FIG", slug))
 ```
 \newpage
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r fig.id="ensemble-perf-sqe", results = "asis", fig.width = 6, fig.asp = 4000/4000}
-slug <- "Ensemble-Summary_All-Targets-SQE"
-supp_cap(slug)
+`r slug <- "Ensemble-Summary_All-Targets-SQE"`
+```{r fig.id="ensemble-perf-sqe", results = "asis", fig.width = 6, fig.asp = 4000/4000, fig.cap = supp_cap(slug)}
 knitr::include_graphics(get_asset("FIG", "Ensemble-Summary_All-Targets-SQE"))
 ```
 \newpage
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-peakrate-risktiles-sqe, results = "asis", fig.asp = 1350/3600}
-slug <- "Risktiles_Peak-Rate-SQE"
-supp_cap(slug)
+`r slug <- "Risktiles_Peak-Rate-SQE"`
+```{r supp-peakrate-risktiles-sqe, results = "asis", fig.asp = 1350/3600, fig.cap = supp_cap(slug)}
 knitr::include_graphics(get_asset("FIG", slug))
 ```
 \newpage
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-peakweek-risktiles-sqe, results = "asis", fig.asp = 1350/3600}
-slug <- "Risktiles_Peak-Week-SQE"
-supp_cap(slug)
+`r slug <- "Risktiles_Peak-Week-SQE"`
+```{r supp-peakweek-risktiles-sqe, results = "asis", fig.asp = 1350/3600, fig.cap = supp_cap(slug)}
 knitr::include_graphics(get_asset("FIG", slug))
 ```
 \newpage
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-cumhosp-risktiles-sqe, results = "asis", fig.asp = 1350/3600}
-slug <- "Risktiles_Cum-Hosp-SQE"
-supp_cap(slug)
+`r slug <- "Risktiles_Cum-Hosp-SQE"`
+```{r supp-cumhosp-risktiles-sqe, results = "asis", fig.asp = 1350/3600, fig.cap = supp_cap(slug)}
 knitr::include_graphics(get_asset("FIG", slug))
 ```
 
@@ -682,9 +636,8 @@ knitr::include_graphics(get_asset("FIG", slug))
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-prosp-error-compare, results = "asis", fig.asp = 10800/32400}
-slug <- "Prospective-Observed-Error"
-supp_cap(slug)
+`r slug <- "Prospective-Observed-Error"`
+```{r supp-prosp-error-compare, results = "asis", fig.asp = 10800/32400, fig.cap = supp_cap(slug)}
 knitr::include_graphics(get_asset("FIG", slug))
 ```
 
@@ -692,8 +645,16 @@ knitr::include_graphics(get_asset("FIG", slug))
 
 <!-- SUPPLEMENTAL FIGURE -->
 
-```{r supp-obs-on-sim, results = "asis", fig.asp = 10800/32400}
-slug <- "Observed-Predict-Simulated"
-supp_cap(slug)
+`r slug <- "Observed-Predict-Simulated"`
+```{r supp-obs-on-sim, results = "asis", fig.asp = 10800/32400, fig.cap = supp_cap(slug)}
+knitr::include_graphics(get_asset("FIG", slug))
+```
+
+
+<!-- SUPPLEMENTAL FIGURE -->
+
+`r slug <- "Boxplot_H01-W16-Risks_PeakRate-LambdaMin"`
+`r slug <- "Boxplot_H01-W16-Risks_PeakRate-LambdaMin"`
+```{r supp-h1w16-replicates, results = "asis", fig.width = 6.5, fig.cap = supp_cap(slug)}
 knitr::include_graphics(get_asset("FIG", slug))
 ```

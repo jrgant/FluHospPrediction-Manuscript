@@ -63,6 +63,7 @@ if (dupfiles_bool == TRUE) stop("Duplicate files are present.")
 ## Copy figures into this manuscript directory
 if (!dir.exists("figures")) dir.create("figures")
 fntab[, file.copy(from = file.path(assetdir, files),
-                  to = file.path("figures", newname))]
+                  to = file.path("figures", newname),
+                  overwrite = TRUE)]
 
 list.files("figures")

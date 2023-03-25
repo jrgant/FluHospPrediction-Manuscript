@@ -76,7 +76,7 @@ tmpcts <- fread(
 )
 ```
 
-We simulated 15,000 curves, where each empirical shape template was used to simulate between `r tmpcts[, min(as.numeric(stringr::str_remove(N, ",")))]` and `r tmpcts[, format(max(as.numeric(stringr::str_remove(N, ","))), big.mark = ",")]` curves. We considered the resultant set of simulated curves to be a plausible distribution of hypothetical flu seasons that could be observed in principle [@Brooks2015-fl] (Figure \@ref(fig:empsim-compare)). While the simulated distributions of prediction targets differed from the empirical distributions (Figure \@ref(fig:simcompare)), only 15 empirical seasons were available and may not capture the range of possible hospitalization curves [@Brooks2015-fl].
+We simulated 15,000 curves, where each empirical shape template was used to simulate between `r tmpcts[, min(as.numeric(stringr::str_remove(N, ",")))]` and `r tmpcts[, format(max(as.numeric(stringr::str_remove(N, ","))), big.mark = ",")]` curves. We considered the resultant set of simulated curves to be a plausible distribution of hypothetical flu seasons that could be observed in principle [@Brooks2015-fl] (Figure \@ref(fig:empsim-compare); Web Figure 2). While the simulated distributions of prediction targets differed from the empirical distributions (Figure \@ref(fig:simcompare)), only 15 empirical seasons were available and may not capture the range of possible hospitalization curves [@Brooks2015-fl].
 
 ## Super learner
   
@@ -164,7 +164,9 @@ _Squared error loss._ The ensemble learner trained to optimize predictions for t
   
 ## Subanalysis
 
-Across all prediction targets, the ensemble super learners trained on simulated and observed data both tended to improve on the naive median prediction using observed data from prior seasons (Figure  \@ref(fig:prosp-application), Web Figure 17). These improvements were more apparent in the 2017--18 influenza season which was more severe than 2016--17 and 2018--19 with respect to peak rate and cumulative hospitalizations. In addition, ensembles tended to produce predictions of similar quality across the flu season, while the ensemble trained only on observed data generated several predictions of much poorer quality than both the ensemble trained in simulated data and the naive median prediction. These instances occurred during the 2017--18 season---in Week 5 for peak rate and in Weeks 5 and 20 for peak week. The ensemble trained on simulated data produced predictions of more stable quality. As in the main analysis, the ensemble's prediction error from the super learner trained in simulated data was similar to that of the discrete super learner, though the model selected as the discrete super learner varied by prediction target, season, and week.
+For the peak rate and cumulative hospitalization rate prediction targets, the ensemble super learners trained on simulated and observed data both performed similarly to or improved upon on a prediction using the naive median from prior seasons across most weeks of the influenza season (Figure  \@ref(fig:prosp-application), Web Figure 17). These improvements were more apparent in the 2017--18 influenza season, which was more severe than 2016--17 and 2018--19 with respect to these outcomes. However, the ensembles trained only on observed data generated several predictions of much poorer quality than the ensemble trained in simulated data and, in some cases, even the empirically trained discrete super learner. The most notable instances occurred during the 2017--18 season---in Weeks 20 and 25 for peak rate and in Weeks 5 and 15 for peak week. Ensembles trained on simulated data generally produced predictions of more stable quality. An exception to this pattern arises for the cumulative hospitalization rate, where the ensemble super learner appears to generate less accurate and less stable predictions during the early weeks of the season, compared to the empirically trained ensembles. Neither type of ensemble appeared to improve predictions of the peak week, and in many cases, underperformed versus the naive median prediction for this prediction target.
+
+As in the main analysis, the ensemble's prediction error from the super learner trained in simulated data usually was similar to that of the discrete super learner (with some exceptions), though the model selected as the discrete super learner varied by prediction target, season, and week.
 
 When used to predict outcomes among the simulated influenza hospitalization curves, ensembles trained only on observed data exhibited higher prediction errors than those trained on simulated data for all prediction targets throughout most of the flu season (Web Figure 18).
 
@@ -188,6 +190,8 @@ Second, we did not implement the super learner as a time series in which predict
 
 Third, because we modeled seasonal influenza hospitalizations, our results do not apply to influenza pandemics. However, ensembles have become important tools for forecasting infectious disease pandemics in general (e.g., the SARS-CoV-2 pandemic [https://viz.covid19forecasthub.org]).
 
+Fourth, even the ensemble super learner may be subject to instability. In Web Figure 19, we describe an instance where the ensemble's cross-validated prediction risk in Week 16 for the peak hospitalization rate (main analysis) spiked to more than double that shown in Figures \@ref(fig:ensemble-perf-main) and \@ref(fig:ensemble-perf-regscale). We traced this spike to an apparently anomalous training run in a single validation set. Researchers should thoroughly diagnose the performance of ensemble models just as they would a statistical prediction model.
+
 Finally, in our prospective subanalysis we held out empirical shape templates from seasons prior to the target season in order to re-train the ensemble. However, we did not resimulate the underlying curves to avoid including curves based on sampled parameters from the target season (e.g., peak rate). Thus, the ensemble trained in simulation data may have had an inherent advantage over the ensemble trained in empirical data.
 
 We found that an ensemble super learner consistently outperformed a naive prediction and performed approximately as well as the discrete super learner. Future work should 1) investigate the super learner's performance in empirical data incorporating additional information on influenza activity, 2) compare the external predictive validity of ensemble super learners trained using different component learner libraries specified _a priori_, and 3) translate the approach to generate probabilistic in-season forecasts. In addition, adapting the current approach to produce forecasts at the state or region levels may be important for targeting public health activities more precisely to mitigate the effects of seasonal flu epidemics.
@@ -205,13 +209,19 @@ We found that an ensemble super learner consistently outperformed a naive predic
 # Tables
 
 <!-- TABLE ONE -->
-```{r table1, tab.id="targtable", tab.cap="Empirical distributions of peak hospitalization rate, peak hospitalization week, and cumulative hospitalization rate in the United States, 2003--2019.^a^"}
+```{r table1, tab.id="targtable"}
+set_flextable_defaults(font.family = "Times New Roman")
 
 targets <- fread(get_asset("TAB", "Prediction-Targets", simdat_date))
 targets <- targets[Season != "2009-10"]
 
 targets %>%
   flextable(., cwidth = c(0.7, rep(1.3, 3))) %>%
+  set_caption(
+    as_paragraph(
+      "Empirical distributions of peak hospitalization rate, peak hospitalization week, and cumulative hospitalization rate in the United States, 2003--2019.", as_sup("a")
+    )
+  ) %>%
   compose(.,
     part = "header", j = "Peak rate",
     value = as_paragraph("Peak rate", as_sup("b"))
@@ -226,7 +236,7 @@ targets %>%
 ```
 
 ::: {custom-style="FlexTable Footnote"}
-^a^ Source: CDC FluView (Emerging Infections Program). Pandemic influenza season 2009-2010 omitted.
+^a^ Source: CDC FluView, Emerging Infections Program [@Centers_for_Disease_Control_and_Prevention2016-nr]. Pandemic influenza season 2009-2010 omitted.
 
 ^b^ Peak rate and cumulative hospitalizations expressed per 100,000 population. 
 :::
@@ -234,6 +244,7 @@ targets %>%
 \newpage
 
 <!-- TABLE TWO -->
+
 ```{r table2, tab.id="candmodels-tuning-table", tab.cap="Component learners and tuning parameters."}
 
 tunetab <- tribble(
@@ -321,15 +332,22 @@ _ncov_, number of predictors
 
 <!-- TABLE THREE -->
 
-```{r table3, tab.id="main-analysis-risk-table", tab.cap="Prediction risks for the ensemble and discrete super learner predictions of the peak hospitalization rate, peak hospitalization week, and cumulative hospitalization rate, by week of influenza season.^a^ Estimates presented as mean risk (standard error)."}
+<!-- (ref:tab3cap) Prediction risks for the ensemble and discrete super learner predictions of the peak hospitalization rate, peak hospitalization week, and cumulative hospitalization rate, by week of influenza season.^a^ Estimates presented as mean risk (standard error). -->
 
+```{r table3, tab.id="main-analysis-risk-table"}
 rt <- flextable(prwc_risks)
 esl_lab <- as_paragraph("EnsembleSL", as_sup("b"))
 dsl_lab <- as_paragraph("DiscreteSL", as_sup("c"))
 
 prwc_risks %>%
   flextable(cwidth = c(0.52, rep((6.6 - 0.52) / 6, 6))) %>%
-  compose(., 
+  set_caption(
+    as_paragraph(
+      "Prediction risks for the ensemble and discrete super learner predictions of the peak hospitalization rate, peak hospitalization week, and cumulative hospitalization rate, by week of influenza season.", as_sup("a"), " Estimates presented as mean risk (standard error)."
+    ),
+    word_stylename = "Table Caption"
+  ) %>%
+  compose(.,
     part = "header",
     j = rt$col_keys[which(rt$col_keys %like% "CV")],
     value = esl_lab
@@ -362,7 +380,7 @@ b_bit <- stringr::str_extract(fullfn, "The ensemble super learner.*component mod
 c_bit <- stringr::str_extract(fullfn, "The discrete super learner.*component model\\.")
 
 cat(
-  "::: {custom-style='FlexTable Footnote'}", "\n",
+  '::: {custom-style="FlexTable Footnote"}', "\n",
   "SL, super learner", "\n\n",
   "^a^ ", a_bit, "\n\n",
   "^b^ ", b_bit, "\n\n",
@@ -371,6 +389,7 @@ cat(
   sep = ""
 )
 ```
+
 
 \newpage
 # Figures
@@ -401,7 +420,7 @@ knitr::include_graphics(get_asset("FIG", "Ensemble-Summary_All-Targets_Regular-S
 ```
 
 \newpage
-```{r fig.id="prosp-application", fig.cap = "**Prospective assessment of super learners trained on simulated data and observed data, as well as a naive prediction based on observed data.** Ensemble and discrete super learners are shown in each week for both super learner routines (i.e., trained on observed vs. simulated data). A) Peak rate, 2016--17 influenza season; B) Peak rate, 2017--18 influenza season; C) Peak rate, 2018--19 influenza season; D) Peak week, 2016--17 influenza season; E) Peak week, 2017--18 influenza season; F) Peak week, 2018--19 influenza season; G) Cumulative hospitalizations, 2016--17 inluenza season; H) Cumulative hospitalizations, 2017--18 influenza season; I) Cumulative hospitalizations, 2018--19 influenza season. Peak hospitalization rate and cumulative hospitalizations per 100,000 population.", fig.width = 5.5, fig.asp = 14400/14400}
+```{r fig.id="prosp-application", fig.cap = "**Prospective assessment of super learners trained on simulated data and observed data, as well as a naive prediction based on observed data (median outcome from preceding seasons).** Predictions from ensemble and discrete super learners are shown in each week for both super learner routines (i.e., trained on observed vs. simulated data). Horizontal black dashed lines depict the prediction target, while horizontal gray dashed lines depict the median of a given outcome in preceding seasons. Peak hospitalization rate and cumulative hospitalizations per 100,000 population. A) Peak rate, 2016--17 influenza season; B) Peak rate, 2017--18 influenza season; C) Peak rate, 2018--19 influenza season; D) Peak week, 2016--17 influenza season; E) Peak week, 2017--18 influenza season; F) Peak week, 2018--19 influenza season; G) Cumulative hospitalizations, 2016--17 inluenza season; H) Cumulative hospitalizations, 2017--18 influenza season; I) Cumulative hospitalizations, 2018--19 influenza season.", fig.width = 5.5, fig.asp = 14400/14400}
 
 knitr::include_graphics(get_asset("FIG", "Prospective-Observed-Application"))
 ```

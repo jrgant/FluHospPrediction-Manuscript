@@ -25,14 +25,14 @@ opts_chunk$set(
 )
 
 # paper output directory
-assetdir <- "~/HDD/projects/FluHospPrediction/results/00_paper_output/"
+assetdir <- "~/fhp/results/00_paper_output/"
 
 # table font
 global_table_font <- "Times New Roman"
 
 # function to get a set of files based on their creation date
-global_date <- "2022-08-16"     # set accordingly
-simdat_date <- "2022-08-16"
+global_date <- "2023-03-21"     # set accordingly
+simdat_date <- "2023-03-21"
 
 get_asset <- function(type, descr, date = global_date, pdfout = TRUE) {
 
@@ -80,7 +80,7 @@ risktabfn <- function(target, sqe = FALSE) {
   texts <- c(
     "Peak rate" = "peak hospitalization rate",
     "Peak week" = "week in which the peak hospitalization rate occurred",
-    "Cumulative rate" = "cumulative hospitalization rate"
+    "Cumulative hospitalizations" = "cumulative hospitalization rate"
   )
 
   paste(
@@ -141,7 +141,9 @@ supp <- data.table(
     ## Squared error loss
     "Table", "Table", "Table", "Figure", "Figure", "Figure", "Figure",
     ## Observed vs. simulated training data (ensemble error)
-    "Figure", "Figure"
+    "Figure", "Figure",
+    ## Replicate runs for Holdout 1 Week 16 validation set (PeakRate-LambdaMin)
+    "Figure"
   ),
   file = c(
     ## Main analysis methods
@@ -181,7 +183,9 @@ supp <- data.table(
     "Risktiles_Cum-Hosp-SQE",
     ## comparison of prediction errors, observed vs. training data
     "Prospective-Observed-Error",
-    "Observed-Predict-Simulated"
+    "Observed-Predict-Simulated",
+    ## H1W16 replicate validation sets
+    "Boxplot_H01-W16-Risks_PeakRate-LambdaMin"
   ),
   cap = c(
     ## Main analysis methods
@@ -220,7 +224,9 @@ supp <- data.table(
     rtfig_cap("Peak week", sqeslug),
     rtfig_cap("Cumulative rate", sqeslug),
     "Cross-validated risks for prospective predictions using ensemble super learners (ESL) trained on observed data (x-axis) and simulated data (y-axis), by prediction target and influenza season. Points falling below the diagonal line indicate higher prediction error for the ESL trained on observed data, while points falling above the diagonal line indicate higher prediction risk for the ESL trained on simulated data.",
-    "Mean cross-validated risks (natural log scale) for ensemble super learners trained on simulated data versus ensemble super learners trained on the 15 observed influenza hospitalization curves when used to predict outcomes on the simulated hospitalization curves. As in the prospective analysis, training the super learner on simulated data appears to improve the stability of the ensemble predictions, avoiding the extreme prediction errors exhibited by ensembles trained only on observed data."
+    "Mean cross-validated risks (natural log scale) for ensemble super learners trained on simulated data versus ensemble super learners trained on the 15 observed influenza hospitalization curves when used to predict outcomes on the simulated hospitalization curves. As in the prospective analysis, training the super learner on simulated data appears to improve the stability of the ensemble predictions, avoiding the extreme prediction errors exhibited by ensembles trained only on observed data.",
+    # H1W16 validation set replicates
+    "Absolute prediction errors (peak rate, main analysis) for the ensemble super learner (ESL) across 21 individual training runs at Week 16 using the same validation fold, which consists of simulated hospitalization curves based on the corresponding 2003--04 empirical shape template. We initially noted a spike in the cross-validated risk for the ESL at Week 16 and traced the spike to poor performance in this validation set (ORIG). To assess the potential for this poor fit having been an anomaly, we repeated this iteration of the nested cross-validation procedure an additional 20 times and plotted the corresponding prediction errors for each replicate (1--20). In all 20 replicates, the ESL exhibited fold-specific risks in line with prediction errors in the other validation sets. Concluding that our original trianing fit was indeed an anomaly, we selected one of the replicates at random in order to calculate the ESL's cross-validated risk for this outcome during this week of the flu season."
   )
 )
 
@@ -230,10 +236,20 @@ supp[, .(type, number)][order(-type)]
 
 ## A function to output a supplemental material caption
 ## as Markdown markup.
-supp_cap <- function(fileslug) {
+supp_cap <- function(fileslug, make_prefix = FALSE) {
   info <- supp[file == fileslug]
-  cat(info[, paste0("Web ", info[, type], " ",
-                    number, ". ", cap)])
+  ## cat(
+  ##   info[, paste0(
+  ##     "Web ", info[, type], " ", number, ". ", cap
+  ##   )]
+  ## )
+  if (make_prefix == TRUE) {
+    info[, paste0(
+      "Web ", info[, type], " ", number, ". ", cap
+    )]
+  } else {
+    info$cap
+  }
 }
 
 ## A function to output the risk tables.
